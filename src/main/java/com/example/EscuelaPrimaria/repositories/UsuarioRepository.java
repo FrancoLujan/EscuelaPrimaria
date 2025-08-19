@@ -8,8 +8,8 @@ import java.util.Optional;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-        // devuelve un usuario o un Optional.empty()
-        Optional findUserEntityByUsername(String username);
+
+        Optional<Usuario> findUsuarioByNombre(String nombre);
 
 
 

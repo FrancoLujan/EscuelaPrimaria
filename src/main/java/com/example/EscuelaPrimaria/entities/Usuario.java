@@ -28,6 +28,7 @@ public class Usuario {
     @Column(name = "password")
     private String password;
 
+    //agregado
     @Column(name = "mail")
     private String mail;
 

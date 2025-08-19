@@ -28,6 +28,9 @@ public class Usuario {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "mail")
+    private String mail;
+
 
     @ManyToMany(mappedBy = "usuarios")
     private List<Rol> roles;

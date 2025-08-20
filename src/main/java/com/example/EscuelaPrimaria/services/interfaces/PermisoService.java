@@ -1,6 +1,4 @@
 package com.example.EscuelaPrimaria.services.interfaces;
 
-
-public interface GradoService<T, K> extends Crud<T, K> {
-
+public interface PermisoService<T, K>  extends Crud<T, K>{
 }

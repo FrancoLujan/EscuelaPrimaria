@@ -1,10 +1,13 @@
 package com.example.EscuelaPrimaria.gestores;
 
 import com.example.EscuelaPrimaria.repositories.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Getter
 // ESTE GESTOR MANEJA LAS CLASES PURAS DE EL DOMINIO
 public class GestorRepo {
 

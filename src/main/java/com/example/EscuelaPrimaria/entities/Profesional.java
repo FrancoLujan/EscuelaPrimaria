@@ -1,5 +1,6 @@
 package com.example.EscuelaPrimaria.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +29,6 @@ public class Profesional {
 
     @OneToOne(mappedBy = "profesional")
     private Usuario usuario;
-
 
     @OneToOne
     @JoinColumn(name="id_grado")

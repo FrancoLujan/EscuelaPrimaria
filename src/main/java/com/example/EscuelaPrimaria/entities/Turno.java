@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalTime;
+
 @Entity
 @Table(name = "TURNOS")
 @Getter @Setter
@@ -21,10 +23,10 @@ public class Turno {
     private String nombre;
 
     @Column(name="horaInicio")
-    private int horaInicio;
+    private LocalTime horaInicio;
 
     @Column(name = "horaFin")
-    private int horaFin;
+    private LocalTime horaFin;
 
     @OneToOne
     @JoinColumn(name = "id_grado")

@@ -1,5 +1,6 @@
 package com.example.EscuelaPrimaria.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,9 +29,12 @@ public class Grado {
     @OneToOne(mappedBy = "grado")
     private Profesional profesor;
 
-    @OneToMany(mappedBy = "grado")
-    List<Materia> materias;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "grado")
-    List<Alumno> alumnos = new ArrayList<>(5);
+    List<Materia> materias = new ArrayList<>(5);
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "grado")
+    List<Alumno> alumnos;
 }

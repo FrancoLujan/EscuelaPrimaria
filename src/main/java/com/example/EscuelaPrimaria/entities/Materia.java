@@ -1,5 +1,7 @@
 package com.example.EscuelaPrimaria.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +20,11 @@ public class Materia {
     @Column(name = "nombre")
     private String nombre;
 
+    @Column(name = "nota")
+    private int nota;
+
     @ManyToOne
     @JoinColumn(name = "id_grado")
+    @JsonBackReference
     private Grado grado;
 }

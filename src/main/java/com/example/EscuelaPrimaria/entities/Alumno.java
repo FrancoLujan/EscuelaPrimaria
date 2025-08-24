@@ -1,5 +1,7 @@
 package com.example.EscuelaPrimaria.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +27,7 @@ public class Alumno {
 
     @ManyToOne
     @JoinColumn(name = "id_grado")
+    @JsonBackReference
     private Grado grado;
 
     @OneToOne(mappedBy = "alumno")

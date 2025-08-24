@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
+
 @Entity
 @Setter @Getter
 @AllArgsConstructor
@@ -24,6 +26,8 @@ public class Alumno {
     @Column(name = "cuil")
     private Long cuil;
 
+    @Column(name = "fechaDeNacimiento")
+    private Date fechaNacimiento;
 
     @ManyToOne
     @JoinColumn(name = "id_grado")

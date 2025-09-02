@@ -72,7 +72,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
     }
 
 
-    public void agregarGrado(GradoDtoE grado) {
+    public void agregarGrado(GradoDtoE grado) throws EntityExistsException {
 
         if (!existenciaGrado(grado)) {
             ModelMapper modelMapper = new ModelMapper();
@@ -84,7 +84,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
     }
 
-    public void actualizarGrado(GradoDtoE grado) {
+    public void actualizarGrado(GradoDtoE grado) throws EntityNotFoundException {
 
         if (existenciaGrado(grado)) {
             ModelMapper modelMapper = new ModelMapper();
@@ -96,7 +96,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
     }
 
-    public void eliminarGrado(GradoDtoE grado) {
+    public void eliminarGrado(GradoDtoE grado) throws EntityNotFoundException {
         if (existenciaGrado(grado)) {
             ModelMapper modelMapper = new ModelMapper();
             Grado gradoEntity = modelMapper.map(grado, Grado.class);
@@ -115,7 +115,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
         return grados.stream().map(grado -> modelMapper.map(grado, GradoDtoS.class)).toList();
     }
 
-    public List<GradoDtoS> buscarGradoPorNivel(int nivel) {
+    public List<GradoDtoS> buscarGradoPorNivel(int nivel) throws EntityNotFoundException {
         ModelMapper modelMapper = new ModelMapper();
         List<Grado> grados = findGradoByNivel(nivel);
         return grados.stream().map(grado -> modelMapper.map(grado, GradoDtoS.class)).toList();

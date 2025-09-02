@@ -4,6 +4,7 @@ import com.example.EscuelaPrimaria.dtos.entrada.GradoDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.GradoDtoS;
 import com.example.EscuelaPrimaria.entities.Grado;
 import com.example.EscuelaPrimaria.enums.NivelEnum;
+import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.gestores.GestorRepo;
 import com.example.EscuelaPrimaria.services.interfaces.GradoService;
 import jakarta.persistence.EntityExistsException;
@@ -26,7 +27,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
 
     private final GestorRepo gestor;
-
+    private final GestorConversionDto gestorConversionDto;
     @Override
     public void add(Grado entity) {
         gestor.getGradoRepository().save(entity);
@@ -111,14 +112,14 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
     public List<GradoDtoS> todos() {
         ModelMapper modelMapper = new ModelMapper();
-        List<Grado> grados = gestor.getGradoRepository().findAll();
-        return grados.stream().map(grado -> modelMapper.map(grado, GradoDtoS.class)).toList();
+        List<Grado> grados = findAll();
+        return grados.stream().map(gestorConversionDto::converterGradoDtoS).toList();
     }
 
     public List<GradoDtoS> buscarGradoPorNivel(int nivel) throws EntityNotFoundException {
         ModelMapper modelMapper = new ModelMapper();
         List<Grado> grados = findGradoByNivel(nivel);
-        return grados.stream().map(grado -> modelMapper.map(grado, GradoDtoS.class)).toList();
+        return grados.stream().map(gestorConversionDto::converterGradoDtoS).toList();
 
 
     }

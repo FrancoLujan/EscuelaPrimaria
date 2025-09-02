@@ -23,7 +23,7 @@ public class Alumno {
     @Column(name = "apellido")
     private String apellido;
 
-    @Column(name = "cuil")
+    @Column(name = "cuil", unique = true)
     private Long cuil;
 
     @Column(name = "fechaDeNacimiento")

@@ -62,8 +62,8 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
     }
 
     @Override
-    public boolean findGradoByTurnoEqualsIgnoreCase(String turnoId) {
-        return gestor.getGradoRepository().findGradoByTurnoEqualsIgnoreCase(turnoId);
+    public boolean findGradoByTurnoEqualsIgnoreCase(String turno) {
+        return gestor.getGradoRepository().findGradoByTurnoEqualsIgnoreCase(turno);
     }
 
     @Override

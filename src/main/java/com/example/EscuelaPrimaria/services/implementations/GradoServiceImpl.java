@@ -77,7 +77,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
         if (!existenciaGrado(grado)) {
             ModelMapper modelMapper = new ModelMapper();
             Grado gradoEntity = modelMapper.map(grado, Grado.class);
-            gestor.getGradoRepository().save(gradoEntity);
+            add(gradoEntity);
         } else {
             throw new EntityExistsException("El grado existe en el sistema");
         }
@@ -89,7 +89,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
         if (existenciaGrado(grado)) {
             ModelMapper modelMapper = new ModelMapper();
             Grado gradoEntity = modelMapper.map(grado, Grado.class);
-            gestor.getGradoRepository().save(gradoEntity);
+            update(gradoEntity);
         } else {
             throw new EntityNotFoundException("El grado no existe en el sistema");
         }
@@ -100,7 +100,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
         if (existenciaGrado(grado)) {
             ModelMapper modelMapper = new ModelMapper();
             Grado gradoEntity = modelMapper.map(grado, Grado.class);
-            gestor.getGradoRepository().delete(gradoEntity);
+            delete(gradoEntity);
 
         } else {
             throw new EntityNotFoundException("El grado no se puede eliminar porque no existe");

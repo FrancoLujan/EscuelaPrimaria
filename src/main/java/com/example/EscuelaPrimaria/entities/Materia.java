@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Materia {
+public class  Materia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;

@@ -28,6 +28,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
     private final GestorRepo gestor;
     private final GestorConversionDto gestorConversionDto;
+
     @Override
     public void add(Grado entity) {
         gestor.getGradoRepository().save(entity);
@@ -121,11 +122,14 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
         List<Grado> grados = findGradoByNivel(nivel);
         return grados.stream().map(gestorConversionDto::converterGradoDtoS).toList();
 
-
     }
 
-    private boolean existenciaGrado(GradoDtoE grado) {
+    private boolean existenciaGrado(GradoDtoE grado) throws IllegalArgumentException {
         //            throw new EntityExistsException("El grado existe en el sistema");
+        if (grado.getNivel() == null || grado.getTurno() == null) {
+            throw new IllegalArgumentException("Error algumentos vacios");
+
+        }
         return findGradoByNivelEqualsIgnoreCase(grado.getNivel().getValor())
                 && findGradoByTurnoEqualsIgnoreCase(grado.getTurno().getNombre().name());
     }

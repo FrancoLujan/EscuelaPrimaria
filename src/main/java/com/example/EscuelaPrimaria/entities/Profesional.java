@@ -14,7 +14,6 @@ import lombok.Setter;
 public class Profesional {
 
     @Id
-
     private Long cuil;
 
     @Column(name = "nombre")

@@ -38,7 +38,7 @@ public class Usuario {
 
 
     @OneToOne
-    @JoinColumn(name = "id_profesional")
+    @JoinColumn(name = "cuil_profesional")
     private Profesional profesional;
 
     @OneToOne

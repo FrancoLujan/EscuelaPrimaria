@@ -25,12 +25,12 @@ public class ProfesionalServiceImpl implements ProfesionalService<Profesional, L
     }
 
     @Override
-    public List<Profesional> getAll() {
+    public List<Profesional> findAll() {
         return List.of();
     }
 
     @Override
-    public Profesional getById(Long id) {
+    public Profesional findById(Long id) {
         return null;
     }
 }

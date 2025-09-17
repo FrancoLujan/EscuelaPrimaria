@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface GradoRepository extends JpaRepository<Grado, Long> {
-   boolean findGradoByNivelEqualsIgnoreCase(int nivel);
-   boolean findGradoByTurnoEqualsIgnoreCase(String turno);
+   boolean existsGradoByNivel(int nivel);
+   boolean existsGradoByTurno_Nombre(String turnoNombre);
    List<Grado> findGradoByNivel(int nivel);
 }

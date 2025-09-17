@@ -8,6 +8,7 @@ import java.util.List;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService<Usuario, Long> {
+
     @Override
     public Usuario getByName(String name) {
         return null;
@@ -29,12 +30,12 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long> {
     }
 
     @Override
-    public List<Usuario> getAll() {
+    public List<Usuario> findAll() {
         return List.of();
     }
 
     @Override
-    public Usuario getById(Long id) {
+    public Usuario findById(Long id) {
         return null;
     }
 }

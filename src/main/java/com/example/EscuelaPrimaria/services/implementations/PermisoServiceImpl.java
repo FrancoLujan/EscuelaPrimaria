@@ -8,6 +8,7 @@ import java.util.List;
 
 @Service
 public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
+
     @Override
     public void add(Permiso entity) {
 
@@ -24,12 +25,12 @@ public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
     }
 
     @Override
-    public List<Permiso> getAll() {
+    public List<Permiso> findAll() {
         return List.of();
     }
 
     @Override
-    public Permiso getById(Long id) {
+    public Permiso findById(Long id) {
         return null;
     }
 }

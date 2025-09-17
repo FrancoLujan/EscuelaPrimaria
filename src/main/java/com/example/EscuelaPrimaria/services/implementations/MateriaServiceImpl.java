@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MateriaServiceImpl implements MateriaService<Materia, Long> {
     private final GestorRepo gestorRepo;
-    private final GestorConversionDto gestorConversionDto;
+
 
     @Override
     public void add(Materia entity) {

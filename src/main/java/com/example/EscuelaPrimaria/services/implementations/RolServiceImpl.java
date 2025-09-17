@@ -24,12 +24,14 @@ public class RolServiceImpl implements RolService<Rol, Long > {
     }
 
     @Override
-    public List<Rol> getAll() {
+    public List<Rol> findAll() {
         return List.of();
     }
 
     @Override
-    public Rol getById(Long id) {
+    public Rol findById(Long id) {
         return null;
     }
+
+
 }

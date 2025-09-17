@@ -24,12 +24,12 @@ public class TurnoServiceImpl implements TurnoService<Turno, Long> {
     }
 
     @Override
-    public List<Turno> getAll() {
+    public List<Turno> findAll() {
         return List.of();
     }
 
     @Override
-    public Turno getById(Long id) {
+    public Turno findById(Long id) {
         return null;
     }
 }

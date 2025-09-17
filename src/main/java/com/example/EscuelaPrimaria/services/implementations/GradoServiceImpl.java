@@ -3,23 +3,16 @@ package com.example.EscuelaPrimaria.services.implementations;
 import com.example.EscuelaPrimaria.dtos.entrada.GradoDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.GradoDtoS;
 import com.example.EscuelaPrimaria.entities.Grado;
-import com.example.EscuelaPrimaria.enums.NivelEnum;
 import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.gestores.GestorRepo;
 import com.example.EscuelaPrimaria.services.interfaces.GradoService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -58,14 +51,15 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
                 .orElseThrow(() -> new EntityNotFoundException("no se encontro grado con el id:" + id));
     }
 
+
     @Override
-    public boolean findGradoByNivelEqualsIgnoreCase(int nivel) {
-        return gestor.getGradoRepository().findGradoByNivelEqualsIgnoreCase(nivel);
+    public boolean existsGradoByNivel(int nivel) {
+        return gestor.getGradoRepository().existsGradoByNivel(nivel);
     }
 
     @Override
-    public boolean findGradoByTurnoEqualsIgnoreCase(String turno) {
-        return gestor.getGradoRepository().findGradoByTurnoEqualsIgnoreCase(turno);
+    public boolean existsGradoByTurno_Nombre(String turno) {
+        return gestor.getGradoRepository().existsGradoByTurno_Nombre(turno);
     }
 
     @Override
@@ -130,8 +124,8 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
             throw new IllegalArgumentException("Error algumentos vacios");
 
         }
-        return findGradoByNivelEqualsIgnoreCase(grado.getNivel().getValor())
-                && findGradoByTurnoEqualsIgnoreCase(grado.getTurno().getNombre().name());
+        return existsGradoByNivel(grado.getNivel().getValor())
+                && existsGradoByTurno_Nombre(grado.getTurno().getNombre().name());
     }
 
 

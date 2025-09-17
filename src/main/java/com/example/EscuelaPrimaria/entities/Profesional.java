@@ -14,18 +14,14 @@ import lombok.Setter;
 public class Profesional {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
+    private Long cuil;
 
     @Column(name = "nombre")
     private String nombre;
 
     @Column(name = "apellido")
     private String apellido;
-
-    @Column(name = "cuil")
-    private Long cuil;
-
 
     @OneToOne(mappedBy = "profesional")
     private Usuario usuario;

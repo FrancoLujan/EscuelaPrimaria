@@ -32,8 +32,8 @@ public class MateriaServiceImpl implements MateriaService<Materia, Long> {
     }
 
     @Override
-    public void delete(Materia entity) {
-        gestorRepo.getMateriaRepository().deleteById(entity.getId());
+    public void delete(Long id) {
+        gestorRepo.getMateriaRepository().deleteById(id);
 
     }
 
@@ -74,15 +74,15 @@ public class MateriaServiceImpl implements MateriaService<Materia, Long> {
 
     public void eliminarMateria(MateriaDtoE materiaDto) throws IllegalArgumentException {
         if(materiaDto != null) {
-            delete(findMateriaByNombre(materiaDto.getNombre()));
+            delete(getMateriaByNombre(materiaDto.getNombre()).getId());
         }
         throw new IllegalArgumentException("No se puede eliminar la materia");
 
     }
     public void actualizarMateria(MateriaDtoE materiaDto) throws Exception {
         if(materiaDto != null && findExistsMateriaByNombre(materiaDto.getNombre())) {
-            ModelMapper modelMapper = new ModelMapper();
-            Materia materia = modelMapper.map(materiaDto, Materia.class);
+            Materia materia = new Materia();
+            materia.setNombre(materiaDto.getNombre());
             update(materia);
         }
         throw new Exception("No se puede actualizar la materia");

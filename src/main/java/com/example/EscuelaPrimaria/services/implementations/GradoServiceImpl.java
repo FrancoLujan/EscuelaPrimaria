@@ -1,8 +1,10 @@
 package com.example.EscuelaPrimaria.services.implementations;
 
 import com.example.EscuelaPrimaria.dtos.entrada.GradoDtoE;
+import com.example.EscuelaPrimaria.dtos.entrada.TurnoDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.GradoDtoS;
 import com.example.EscuelaPrimaria.entities.Grado;
+import com.example.EscuelaPrimaria.entities.Turno;
 import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.gestores.GestorRepo;
 import com.example.EscuelaPrimaria.services.interfaces.GradoService;
@@ -35,8 +37,8 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
     }
 
     @Override
-    public void delete(Grado entity) {
-        gestor.getGradoRepository().deleteById(entity.getId());
+    public void delete(Long id) {
+        gestor.getGradoRepository().deleteById(id);
 
     }
 
@@ -81,11 +83,12 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
     }
 
     public void actualizarGrado(GradoDtoE grado) throws EntityNotFoundException {
-
+            // CREAR EL METODO MENCIONADO EN ELIMINAR GRADO
         if (existenciaGrado(grado)) {
             ModelMapper modelMapper = new ModelMapper();
-            Grado gradoEntity = modelMapper.map(grado, Grado.class);
-            update(gradoEntity);
+            Grado gradoE = null;
+            gradoE.setTurno(modelMapper.map(grado.getTurno(), Turno.class));
+            gradoE.setNivel(grado.getNivel().getValor());
         } else {
             throw new EntityNotFoundException("El grado no existe en el sistema");
         }
@@ -94,9 +97,8 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
     public void eliminarGrado(GradoDtoE grado) throws EntityNotFoundException {
         if (existenciaGrado(grado)) {
-            ModelMapper modelMapper = new ModelMapper();
-            Grado gradoEntity = modelMapper.map(grado, Grado.class);
-            delete(gradoEntity);
+            // despues agregar en su repo un metodo que devuelva el id del grado segun su turno y nivel
+
 
         } else {
             throw new EntityNotFoundException("El grado no se puede eliminar porque no existe");

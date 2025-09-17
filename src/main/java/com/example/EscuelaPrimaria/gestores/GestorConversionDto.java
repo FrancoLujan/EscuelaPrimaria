@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Component
 
 // CONVERTIR DTOS A MANO (TODO LO QUE INVOLUCRE DATOS RELACIONADOS CON AlumnoDtoS)
+// Es decir todos los deteos complejos de salida
 public class GestorConversionDto {
     // conversion a mano por el tema de mostrar la edad...
     public AlumnoDtoS converterAlumnDtoS(Alumno alumno) {

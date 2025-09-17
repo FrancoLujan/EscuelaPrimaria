@@ -25,7 +25,7 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long> {
     }
 
     @Override
-    public void delete(Usuario entity) {
+    public void delete(Long id) {
 
     }
 

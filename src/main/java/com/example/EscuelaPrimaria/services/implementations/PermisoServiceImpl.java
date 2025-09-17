@@ -20,7 +20,7 @@ public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
     }
 
     @Override
-    public void delete(Permiso entity) {
+    public void delete(Long entity) {
 
     }
 

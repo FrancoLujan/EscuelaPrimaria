@@ -16,6 +16,5 @@ public class AlumnoDtoE {
     private String apellido;
     private Date fechaNacimiento;
     private Long cuil;
-    private GradoDtoE grado;
 
 }

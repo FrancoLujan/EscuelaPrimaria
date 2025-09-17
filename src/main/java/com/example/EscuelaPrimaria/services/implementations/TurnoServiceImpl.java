@@ -19,7 +19,7 @@ public class TurnoServiceImpl implements TurnoService<Turno, Long> {
     }
 
     @Override
-    public void delete(Turno entity) {
+    public void delete(Long id) {
 
     }
 

@@ -19,7 +19,7 @@ public class RolServiceImpl implements RolService<Rol, Long > {
     }
 
     @Override
-    public void delete(Rol entity) {
+    public void delete(Long id) {
 
     }
 

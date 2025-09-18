@@ -6,9 +6,10 @@ import com.example.EscuelaPrimaria.entities.Grado;
 import java.util.List;
 
 public interface GradoService<T, K> extends Crud<T, K> {
-    boolean existsGradoByNivel(int nivel);
+    boolean existsGradoByNivel(K nivel);
     boolean existsGradoByTurno_Nombre(String turno);
-    List<Grado> findGradoByNivel(int nivel);
+    Grado findByGradoByNivel(K nivel, String turno);
+    List<Grado> findGradoByNivel(K nivel);
 
 
 }

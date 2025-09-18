@@ -20,7 +20,7 @@ public class Grado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nivel")
+    @Column(name = "nivel", unique = true, nullable = false)
     private int nivel;
 
     @OneToOne(mappedBy = "grado")

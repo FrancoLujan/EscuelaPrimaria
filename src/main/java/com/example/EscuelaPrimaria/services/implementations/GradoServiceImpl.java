@@ -55,7 +55,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
 
     @Override
-    public boolean existsGradoByNivel(int nivel) {
+    public boolean existsGradoByNivel(Long nivel) {
         return gestor.getGradoRepository().existsGradoByNivel(nivel);
     }
 
@@ -65,7 +65,13 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
     }
 
     @Override
-    public List<Grado> findGradoByNivel(int nivel) {
+    public Grado findByGradoByNivel(Long nivel, String turno) {
+        return gestor.getGradoRepository().findGradoBynivel(nivel, turno);
+    }
+
+
+    @Override
+    public List<Grado> findGradoByNivel(Long nivel) {
         return gestor.getGradoRepository().findGradoByNivel(nivel);
     }
 
@@ -83,10 +89,10 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
     }
 
     public void actualizarGrado(GradoDtoE grado) throws EntityNotFoundException {
-            // CREAR EL METODO MENCIONADO EN ELIMINAR GRADO
+
         if (existenciaGrado(grado)) {
             ModelMapper modelMapper = new ModelMapper();
-            Grado gradoE = null;
+            Grado gradoE = findByGradoByNivel((long) grado.getNivel().getValor(), grado.getTurno().getNombre().name());
             gradoE.setTurno(modelMapper.map(grado.getTurno(), Turno.class));
             gradoE.setNivel(grado.getNivel().getValor());
         } else {
@@ -97,8 +103,8 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
     public void eliminarGrado(GradoDtoE grado) throws EntityNotFoundException {
         if (existenciaGrado(grado)) {
-            // despues agregar en su repo un metodo que devuelva el id del grado segun su turno y nivel
-
+           Grado eliminar  = findByGradoByNivel((long)(grado.getNivel().getValor()), grado.getTurno().getNombre().name());
+            delete(eliminar.getId());
 
         } else {
             throw new EntityNotFoundException("El grado no se puede eliminar porque no existe");
@@ -113,7 +119,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
         return grados.stream().map(gestorConversionDto::converterGradoDtoS).toList();
     }
 
-    public List<GradoDtoS> buscarGradoPorNivel(int nivel) throws EntityNotFoundException {
+    public List<GradoDtoS> buscarGradoPorNivel(Long nivel) throws EntityNotFoundException {
         ModelMapper modelMapper = new ModelMapper();
         List<Grado> grados = findGradoByNivel(nivel);
         return grados.stream().map(gestorConversionDto::converterGradoDtoS).toList();
@@ -126,7 +132,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
             throw new IllegalArgumentException("Error algumentos vacios");
 
         }
-        return existsGradoByNivel(grado.getNivel().getValor())
+        return existsGradoByNivel((long) grado.getNivel().getValor())
                 && existsGradoByTurno_Nombre(grado.getTurno().getNombre().name());
     }
 

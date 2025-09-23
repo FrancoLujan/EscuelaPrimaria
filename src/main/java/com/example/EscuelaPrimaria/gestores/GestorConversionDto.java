@@ -1,14 +1,10 @@
 package com.example.EscuelaPrimaria.gestores;
 
 import com.example.EscuelaPrimaria.dtos.salida.*;
-import com.example.EscuelaPrimaria.entities.Alumno;
-import com.example.EscuelaPrimaria.entities.Grado;
-import com.example.EscuelaPrimaria.entities.Profesional;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.example.EscuelaPrimaria.entities.domain.Alumno;
+import com.example.EscuelaPrimaria.entities.domain.Grado;
+import com.example.EscuelaPrimaria.entities.domain.Profesional;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

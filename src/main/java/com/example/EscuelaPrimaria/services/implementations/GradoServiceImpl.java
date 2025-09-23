@@ -1,7 +1,6 @@
 package com.example.EscuelaPrimaria.services.implementations;
 
 import com.example.EscuelaPrimaria.dtos.entrada.GradoDtoE;
-import com.example.EscuelaPrimaria.dtos.entrada.TurnoDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.GradoDtoS;
 import com.example.EscuelaPrimaria.entities.Grado;
 import com.example.EscuelaPrimaria.entities.Turno;
@@ -66,7 +65,7 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
     @Override
     public Grado findByGradoByNivel(Long nivel, String turno) {
-        return gestor.getGradoRepository().findGradoBynivel(nivel, turno);
+        return gestor.getGradoRepository().findGradoBynivel_AndTurno_Nombre(nivel, turno);
     }
 
 

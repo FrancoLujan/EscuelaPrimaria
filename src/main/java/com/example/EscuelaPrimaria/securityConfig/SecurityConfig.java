@@ -15,22 +15,22 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    //cadena de filtros
-    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        return null;
-    }
-    @Bean
-    //Cordina la auntenticacion; usa el authenticationProvider
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration a) throws Exception {
-        return null;
-    }
-
-    @Bean
-    //Auntentica segun del proveedor
-    public AuthenticationProvider authenticationProvider() {
-        return null;
-    }
+//    @Bean
+//    //cadena de filtros
+//    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+//        return null;
+//    }
+//    @Bean
+//    //Cordina la auntenticacion; usa el authenticationProvider
+//    public AuthenticationManager authenticationManager(AuthenticationConfiguration a) throws Exception {
+//        return null;
+//    }
+//
+//    @Bean
+//    //Auntentica segun del proveedor
+//    public AuthenticationProvider authenticationProvider() {
+//        return null;
+//    }
 
     @Bean
     //ENCRIPTADO

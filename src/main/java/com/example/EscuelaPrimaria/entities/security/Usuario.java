@@ -3,6 +3,7 @@ package com.example.EscuelaPrimaria.entities.security;
 import com.example.EscuelaPrimaria.entities.domain.Alumno;
 import com.example.EscuelaPrimaria.entities.domain.Profesional;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +33,7 @@ public class Usuario {
 
     //agregado
     @Column(name = "mail")
+    @Email
     private String mail;
 
 

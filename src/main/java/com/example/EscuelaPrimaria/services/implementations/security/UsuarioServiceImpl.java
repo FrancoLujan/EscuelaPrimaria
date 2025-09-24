@@ -4,7 +4,7 @@ import com.example.EscuelaPrimaria.dtos.entrada.UsuarioDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.UsuarioDtoS;
 import com.example.EscuelaPrimaria.entities.security.Usuario;
 
-import com.example.EscuelaPrimaria.gestores.GestorRepositorySecurity;
+import com.example.EscuelaPrimaria.repositories.security.UsuarioRepository;
 import com.example.EscuelaPrimaria.services.interfaces.security.UsuarioService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,35 +18,35 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService<Usuario, Long> {
-   private final  GestorRepositorySecurity gestorRepo;
+   private final UsuarioRepository repo;
 
     @Override
     public void add(Usuario entity) {
-        gestorRepo.getUsuarioRepository().save(entity);
+        repo.save(entity);
 
     }
 
     @Override
     public void update(Usuario entity) {
-        gestorRepo.getUsuarioRepository().save(entity);
+        repo.save(entity);
 
     }
 
     @Override
     public void delete(Long id) {
-        gestorRepo.getUsuarioRepository().deleteById(id);
+        repo.deleteById(id);
 
     }
 
     @Override
     public List<Usuario> findAll() {
 
-        return gestorRepo.getUsuarioRepository().findAll();
+        return repo.findAll();
     }
 
     @Override
     public Usuario findById(Long id) {
-        return gestorRepo.getUsuarioRepository().findById(id)
+        return repo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("El usuario no existe"));
     }
 
@@ -62,7 +62,7 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long> {
     @Override
     public Optional<Usuario> findUsuarioByNombre(String nombre) {
 
-        return gestorRepo.getUsuarioRepository().findUsuarioByNombre(nombre);
+        return repo.findUsuarioByNombre(nombre);
     }
 
     @Override

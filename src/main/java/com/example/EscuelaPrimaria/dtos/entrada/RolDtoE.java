@@ -1,4 +1,4 @@
-package com.example.EscuelaPrimaria.dtos.salida;
+package com.example.EscuelaPrimaria.dtos.entrada;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class RolDtoS {
+public class RolDtoE {
     @Enumerated(EnumType.STRING)
     private String rol;
 }

@@ -88,7 +88,7 @@ public class ProfesionalServiceImpl implements ProfesionalService<Profesional, L
     }
 
     public ProfesionalDtoS buscarPorCuil(Long cuil)throws EntityNotFoundException {
-        if(findById(cuil) != null){
+        if(cuil > 0){
             return dto.converterProfesionalDtoS(findById(cuil));
         }else
             throw new EntityNotFoundException("el profesional no existe");

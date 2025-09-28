@@ -29,7 +29,6 @@ public class Rol {
     )
     private List<Usuario> usuarios;
 
-
     @ManyToMany
     @JoinTable(
             name = "rol_permisos",

@@ -1,18 +1,27 @@
 package com.example.EscuelaPrimaria.services.implementations.security;
 
+import com.example.EscuelaPrimaria.dtos.entrada.PermisoDtoE;
+import com.example.EscuelaPrimaria.dtos.entrada.RolDtoE;
+import com.example.EscuelaPrimaria.dtos.salida.PermisoDtoS;
+import com.example.EscuelaPrimaria.dtos.salida.RolDtoS;
+import com.example.EscuelaPrimaria.entities.security.Permiso;
 import com.example.EscuelaPrimaria.entities.security.Rol;
 import com.example.EscuelaPrimaria.repositories.security.RolRepository;
 import com.example.EscuelaPrimaria.services.interfaces.security.RolService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class RolServiceImpl implements RolService<Rol, Long > {
+public class RolServiceImpl implements RolService<Rol, Long> {
     private final RolRepository rolRepository;
+    private final PermisoServiceImpl permisoServiceImpl;
 
     @Override
     public void add(Rol entity) {
@@ -42,10 +51,64 @@ public class RolServiceImpl implements RolService<Rol, Long > {
                 .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado"));
     }
 
-    public void agregarRol() {}
+
+    @Override
+    public boolean existsRolByNombre(String nombre) {
+        return rolRepository.existsRolByNombre(nombre);
+    }
+
+    public void agregarRol(RolDtoE rolDtoE) throws EntityExistsException {
+
+        if (!rolDtoE.getRol().name().isEmpty() && existsRolByNombre(rolDtoE.getRol().name())) {
+            Rol rol = new Rol();
+            rol.setNombre(rolDtoE.getRol().name());
+            add(rol);
+
+        } else {
+            throw new EntityExistsException("El rol ya existe");
+        }
+
+    }
+
+    public void eliminar(Long id)throws EntityNotFoundException {
+
+        if(existsRolByNombre(findById(id).getNombre())){
+            delete(id);
+        }else{
+            throw new EntityNotFoundException("El rol no existe");
+        }
+    }
+    public void actualizar(RolDtoE rolDtoE, Long id) throws EntityNotFoundException {
+        if(existsRolByNombre(rolDtoE.getRol().name())){
+            Rol rol = findById(id);
+            rol.setNombre(rolDtoE.getRol().name());
+            update(rol);
+
+        }
+    }
+    public List<RolDtoS> todos(){
+        ModelMapper model = new ModelMapper();
+        List<Rol> roles = rolRepository.findAll();
+
+        return roles.stream()
+                .map(role -> model.map(role, RolDtoS.class))
+                .toList();
+
+    }
+
+    public RolDtoS buscarRol(Long id)throws EntityNotFoundException {
+        ModelMapper model = new ModelMapper();
+        Rol rol = findById(id);
+        return model.map(rol, RolDtoS.class);
+    }
 
 
-    private void asociarPermisos(){
+    public void asociarPermisos(Long idRol, Long idPermiso) throws EntityNotFoundException {
+       Rol rol =  findById(idRol);
+       Permiso permiso = permisoServiceImpl.findById(idPermiso);
+       rol.getPermisos().add(permiso);
+       update(rol);
+       
 
     }
 

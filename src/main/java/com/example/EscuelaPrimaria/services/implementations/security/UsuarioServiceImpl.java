@@ -2,6 +2,7 @@ package com.example.EscuelaPrimaria.services.implementations.security;
 
 import com.example.EscuelaPrimaria.dtos.entrada.UsuarioDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.UsuarioDtoS;
+import com.example.EscuelaPrimaria.entities.security.Rol;
 import com.example.EscuelaPrimaria.entities.security.Usuario;
 
 import com.example.EscuelaPrimaria.repositories.security.UsuarioRepository;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService<Usuario, Long> {
    private final UsuarioRepository repo;
+   private final RolServiceImpl rolService;
 
     @Override
     public void add(Usuario entity) {
@@ -137,5 +139,12 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long> {
         Usuario usuario = findById(id);
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(usuario, UsuarioDtoS.class);
+    }
+
+    public void asociarRol(Long idUsuario, Long idRol)throws EntityNotFoundException{
+        Usuario usuario = findById(idUsuario);
+        Rol rol = rolService.findById(idRol);
+        usuario.getRoles().add(rol);
+
     }
 }

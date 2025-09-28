@@ -9,6 +9,6 @@ import java.util.List;
 public class PermisoDtoS {
     @Enumerated(EnumType.STRING)
     private PermisoEnum permisoEnum;
-    private List<RolDtoS> roles; // roles asociados
+
 
 }

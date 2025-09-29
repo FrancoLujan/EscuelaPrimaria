@@ -13,13 +13,13 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class   SecurityConfig {
 
 //    @Bean
 //    //cadena de filtros
 //    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-//        return null;
-//    }
+//        return ;
+//   }
 //    @Bean
 //    //Cordina la auntenticacion; usa el authenticationProvider
 //    public AuthenticationManager authenticationManager(AuthenticationConfiguration a) throws Exception {

@@ -2,6 +2,8 @@ package com.example.EscuelaPrimaria.errors;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.hibernate.query.sqm.tree.expression.SqmHqlNumericLiteral;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,8 +27,9 @@ public class GlobalExceptionHandler {
 
 
 
-    @ExceptionHandler(Exception.class) // errores no controlados
+    @ExceptionHandler(Exception.class) // errores no controlados GENERALES
     public ResponseEntity<MensajeError> handleException(Exception e) {
+
         MensajeError mensajeError = new MensajeError(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mensajeError);
     }

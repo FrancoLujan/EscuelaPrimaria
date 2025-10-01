@@ -4,6 +4,7 @@ import com.example.EscuelaPrimaria.dtos.entrada.PermisoDtoE;
 import com.example.EscuelaPrimaria.services.implementations.security.PermisoServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,16 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class PermisoController {
     private final PermisoServiceImpl permisoServiceImpl;
 
-    @PostMapping("/create")
-    public ResponseEntity<PermisoDtoE> create(@RequestBody PermisoDtoE permisoDto) {
-        try{
-            permisoServiceImpl.agregar(permisoDto);
-            return new ResponseEntity<>(permisoDto, HttpStatus.CREATED);
+    @PostMapping("/crear")
+    public ResponseEntity<PermisoDtoE> crear(@RequestBody PermisoDtoE permisoDto) {
 
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        permisoServiceImpl.agregar(permisoDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(permisoDto);
+
 
     }
+
 }

@@ -1,9 +1,60 @@
 package com.example.EscuelaPrimaria.controllers.security;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.EscuelaPrimaria.dtos.entrada.RolDtoE;
+import com.example.EscuelaPrimaria.dtos.salida.RolDtoS;
+import com.example.EscuelaPrimaria.entities.security.Rol;
+import com.example.EscuelaPrimaria.services.implementations.security.RolServiceImpl;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/Rol")
+@AllArgsConstructor
+
 public class RolController {
+    private final RolServiceImpl rolService;
+
+    @PostMapping("/crear")
+    public ResponseEntity<RolDtoE> crear(@RequestBody RolDtoE rol) {
+        rolService.agregarRol(rol);
+        return ResponseEntity.status(HttpStatus.CREATED).body(rol);
+
+    }
+
+    @GetMapping("/todos")
+    public ResponseEntity<List<RolDtoS>> todos() {
+        List<RolDtoS> roles = rolService.todos();
+        return ResponseEntity.status(HttpStatus.OK).body(roles);
+    }
+
+    @GetMapping("/buscarRol/{idRol}")
+    public ResponseEntity<RolDtoS> buscarRol(@PathVariable Long idRol) {
+        RolDtoS rol = rolService.buscarRol(idRol);
+        return ResponseEntity.status(HttpStatus.OK).body(rol);
+
+    }
+
+    @PatchMapping("/asociar/permiso/{idRol}/{idPermiso}")
+    public ResponseEntity<RolDtoS> asociarPermiso(@PathVariable Long idPermiso, @PathVariable Long idRol) {
+        rolService.asociarPermisos(idRol, idPermiso);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(rolService.buscarRol(idRol));
+
+    }
+    @DeleteMapping("/eliminar/{idRol}")
+    public ResponseEntity<String> eliminar(@PathVariable Long idRol) {
+        rolService.eliminar(idRol);
+        return ResponseEntity.status(HttpStatus.OK).body("Rol eliminado exitosamente");
+    }
+    // se actualiza el nombre del rol(si hace cambiar RolEnum)
+    @PatchMapping("/actualizar/{idRol}")
+    public ResponseEntity<RolDtoS> actualizar( @RequestBody RolDtoE rol ,@PathVariable Long idRol) {
+        rolService.actualizar(rol, idRol);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(rolService.buscarRol(idRol));
+    }
+
 }

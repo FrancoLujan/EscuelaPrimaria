@@ -80,9 +80,9 @@ public class RolServiceImpl implements RolService<Rol, Long> {
             throw new EntityNotFoundException("El rol no existe");
         }
     }
-    public void actualizar(RolDtoE rolDtoE, Long id) throws EntityNotFoundException {
+    public void actualizar(RolDtoE rolDtoE, Long idRol) throws EntityNotFoundException {
         if(existsRolByNombre(rolDtoE.getRol().name())){
-            Rol rol = findById(id);
+            Rol rol = findById(idRol);
             rol.setNombre(rolDtoE.getRol().name());
             update(rol);
 
@@ -105,6 +105,9 @@ public class RolServiceImpl implements RolService<Rol, Long> {
     public void asociarPermisos(Long idRol, Long idPermiso) throws EntityNotFoundException {
        Rol rol =  findById(idRol);
        Permiso permiso = permisoServiceImpl.findById(idPermiso);
+       if(rol.getPermisos().contains(permiso)){
+           throw new EntityExistsException("El rol ya tiene el permiso");
+       }
        rol.getPermisos().add(permiso);
        update(rol);
        

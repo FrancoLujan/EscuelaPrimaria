@@ -17,20 +17,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/Grado")
 @AllArgsConstructor
-@PreAuthorize("denyAll()")
 public class GradoController {
-   private final GradoServiceImpl gradoService;
+    private final GradoServiceImpl gradoService;
 
 
-   @GetMapping("/todos")
-   public ResponseEntity<List<GradoDtoS>> todos(){
-       try{
-           List<GradoDtoS> grado = gradoService.todos();
-           return new ResponseEntity<>(grado, HttpStatus.OK);
-       }catch (Exception e){
-           return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-       }
-   }
+    @GetMapping("/todos")
+    public ResponseEntity<List<GradoDtoS>> todos() {
+
+        List<GradoDtoS> grado = gradoService.todos();
+        return ResponseEntity.status(HttpStatus.OK).body(grado);
+
+    }
 
 
 }

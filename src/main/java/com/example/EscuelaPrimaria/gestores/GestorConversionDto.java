@@ -4,16 +4,23 @@ import com.example.EscuelaPrimaria.dtos.salida.*;
 import com.example.EscuelaPrimaria.entities.domain.Alumno;
 import com.example.EscuelaPrimaria.entities.domain.Grado;
 import com.example.EscuelaPrimaria.entities.domain.Profesional;
+import com.example.EscuelaPrimaria.entities.security.Permiso;
+import com.example.EscuelaPrimaria.entities.security.Rol;
+import com.example.EscuelaPrimaria.enums.PermisoEnum;
+import com.example.EscuelaPrimaria.enums.RolEnum;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
 @Component
 
-// CONVERTIR DTOS A MANO (TODO LO QUE INVOLUCRE DATOS RELACIONADOS CON AlumnoDtoS)
+// CONVERTIR DTOS A MANO (TODO LO QUE INVOLUCRE DATOS COMPUESTOS...)
+//
 // Es decir todos los deteos complejos de salida
 public class GestorConversionDto {
     // conversion a mano por el tema de mostrar la edad...
@@ -47,5 +54,25 @@ public class GestorConversionDto {
         profDto.setApellido(profesional.getApellido());
         profDto.setGrado(converterGradoDtoS(profesional.getGrado()));
         return profDto;
+    }
+
+    public RolDtoS converterRolDtoS(Rol rol) {
+        ModelMapper modelMapper = new ModelMapper();
+        RolDtoS rolDtoS = new RolDtoS();
+        rolDtoS.setRol(RolEnum.valueOf(rol.getNombre()));
+
+        List<PermisoDtoS> listaPermisos = rol.getPermisos().
+                stream().map(this::converterPermisoDtoS)
+                .toList();
+
+        rolDtoS.setPermisos(listaPermisos);
+        return rolDtoS;
+    }
+    // OJO RESULTA QUE MAPPER LE CUESTA UN MONTON HACER MAPEOS SI HAY ATRIBUTOS NO PRIMITIVOS
+    // ES MEJOR HACER CONVERSIONES A MANO SIEMPRE Y CUANDO SEAN COMPUESTAS...
+    private PermisoDtoS converterPermisoDtoS(Permiso permiso) {
+        PermisoDtoS permisoDto = new PermisoDtoS();
+        permisoDto.setPermisoEnum(PermisoEnum.valueOf(permiso.getNombre()));
+        return permisoDto;
     }
 }

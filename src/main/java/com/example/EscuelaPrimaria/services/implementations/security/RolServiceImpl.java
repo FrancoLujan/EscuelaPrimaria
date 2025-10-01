@@ -6,6 +6,7 @@ import com.example.EscuelaPrimaria.dtos.salida.PermisoDtoS;
 import com.example.EscuelaPrimaria.dtos.salida.RolDtoS;
 import com.example.EscuelaPrimaria.entities.security.Permiso;
 import com.example.EscuelaPrimaria.entities.security.Rol;
+import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.repositories.security.RolRepository;
 import com.example.EscuelaPrimaria.services.interfaces.security.RolService;
 import jakarta.persistence.EntityExistsException;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class RolServiceImpl implements RolService<Rol, Long> {
     private final RolRepository rolRepository;
     private final PermisoServiceImpl permisoServiceImpl;
+    private final GestorConversionDto conversor;
 
     @Override
     public void add(Rol entity) {
@@ -59,7 +61,7 @@ public class RolServiceImpl implements RolService<Rol, Long> {
 
     public void agregarRol(RolDtoE rolDtoE) throws EntityExistsException {
 
-        if (!rolDtoE.getRol().name().isEmpty() && existsRolByNombre(rolDtoE.getRol().name())) {
+        if (!rolDtoE.getRol().name().isEmpty() && !existsRolByNombre(rolDtoE.getRol().name().toUpperCase())) {
             Rol rol = new Rol();
             rol.setNombre(rolDtoE.getRol().name());
             add(rol);
@@ -87,19 +89,16 @@ public class RolServiceImpl implements RolService<Rol, Long> {
         }
     }
     public List<RolDtoS> todos(){
-        ModelMapper model = new ModelMapper();
+
         List<Rol> roles = rolRepository.findAll();
 
-        return roles.stream()
-                .map(role -> model.map(role, RolDtoS.class))
-                .toList();
+        return  roles.stream().map(conversor::converterRolDtoS).toList();
 
     }
 
     public RolDtoS buscarRol(Long id)throws EntityNotFoundException {
-        ModelMapper model = new ModelMapper();
         Rol rol = findById(id);
-        return model.map(rol, RolDtoS.class);
+        return conversor.converterRolDtoS(rol);
     }
 
 

@@ -11,16 +11,23 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 @Service
-@AllArgsConstructor
-public class UsuarioServiceImpl implements UsuarioService<Usuario, Long> {
-   private final UsuarioRepository repo;
-   private final RolServiceImpl rolService;
+@AllArgsConstructor                             // interface de spring security
+public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDetailsService {
+    private final UsuarioRepository repo;
+    private final RolServiceImpl rolService;
 
     @Override
     public void add(Usuario entity) {
@@ -73,78 +80,112 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long> {
     }
 
 
-    public void agregar(UsuarioDtoE usuarioDtoE)throws EntityExistsException {
-        if(usuarioDtoE.getNombre().isEmpty() || usuarioDtoE.getPassword().isEmpty() || usuarioDtoE.getMail().isEmpty()){
+    public void agregar(UsuarioDtoE usuarioDtoE) throws EntityExistsException {
+        if (usuarioDtoE.getNombre().isEmpty() || usuarioDtoE.getPassword().isEmpty() || usuarioDtoE.getMail().isEmpty()) {
             throw new EntityExistsException("el usuario ya existe");
         }
 
-       Optional<Usuario> usuario =  findUsuarioByNombre(usuarioDtoE.getNombre());
-        if(usuario.isEmpty()) {
+        Optional<Usuario> usuario = findUsuarioByNombre(usuarioDtoE.getNombre());
+        if (usuario.isEmpty()) {
             Usuario usuarioNuevo = new Usuario();
             usuarioNuevo.setNombre(usuarioDtoE.getNombre());
             usuarioNuevo.setPassword(encriptarPassword(usuarioDtoE.getPassword()));
             usuarioNuevo.setMail(usuarioDtoE.getMail());
 
-        }else {
+        } else {
             throw new EntityExistsException("el usuario ya existe");
         }
     }
 
-    public void actualizarMail(Long id,String mail) throws EntityNotFoundException {
-        if(!mail.isEmpty()){
-           Usuario usuario = findById(id);
-           usuario.setMail(mail);
-           update(usuario);
-        }else{
+    public void actualizarMail(Long id, String mail) throws EntityNotFoundException {
+        if (!mail.isEmpty()) {
+            Usuario usuario = findById(id);
+            usuario.setMail(mail);
+            update(usuario);
+        } else {
             throw new EntityNotFoundException("El usuario no existe");
         }
 
     }
-    public void actualizarPassword(Long id,String password) throws EntityNotFoundException {
-        if(!password.isEmpty()){
+
+    public void actualizarPassword(Long id, String password) throws EntityNotFoundException {
+        if (!password.isEmpty()) {
             Usuario usuario = findById(id);
             usuario.setPassword(encriptarPassword(password));
             update(usuario);
-        }else {
+        } else {
             throw new EntityNotFoundException("El usuario no existe");
         }
     }
 
-    public void actualizarNombre(Long id,String nombre) throws EntityNotFoundException {
-        if(!nombre.isEmpty()){
+    public void actualizarNombre(Long id, String nombre) throws EntityNotFoundException {
+        if (!nombre.isEmpty()) {
             Usuario usuario = findById(id);
             usuario.setNombre(nombre);
             update(usuario);
-        }else {
+        } else {
             throw new EntityNotFoundException("El usuario no existe");
         }
     }
+
     // si usaras optional seria un poco mas simple pero solo un poco
     public void eliminar(Long id) throws EntityNotFoundException {
-        if(id != null && id > 0){ // verificamos id porque no lo tomamos en cuenta en delete()
+        if (id != null && id > 0) { // verificamos id porque no lo tomamos en cuenta en delete()
             delete(id);
-        }else{
+        } else {
             throw new EntityNotFoundException("El usuario no existe");
         }
     }
 
-    public List<UsuarioDtoS> todos(){
+    public List<UsuarioDtoS> todos() {
         List<Usuario> usuarios = findAll();
         ModelMapper modelMapper = new ModelMapper();
-        return usuarios.stream().map(e-> modelMapper.map(e, UsuarioDtoS.class)).toList();
+        return usuarios.stream().map(e -> modelMapper.map(e, UsuarioDtoS.class)).toList();
 
 
     }
+
     public UsuarioDtoS buscarUsuario(Long id) throws EntityNotFoundException {
         Usuario usuario = findById(id);
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(usuario, UsuarioDtoS.class);
     }
 
-    public void asociarRol(Long idUsuario, Long idRol)throws EntityNotFoundException{
+    public void asociarRol(Long idUsuario, Long idRol) throws EntityNotFoundException {
         Usuario usuario = findById(idUsuario);
         Rol rol = rolService.findById(idRol);
         usuario.getRoles().add(rol);
 
+    }
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Usuario usuario = findUsuarioByNombre(username)
+                .orElseThrow(() -> new UsernameNotFoundException("El usuario no existe"));
+        // manejar permisos
+        List<SimpleGrantedAuthority> listAuthority = new ArrayList<>();
+
+        // CONVERTIMOS LOS ROLES
+        usuario.getRoles()
+                .forEach(role -> listAuthority.add(new SimpleGrantedAuthority("ROLE_".concat(role.getNombre()))));
+
+        usuario.getRoles().stream()
+                .flatMap(role -> role.getPermisos().stream())
+                .forEach(permiso -> listAuthority.add(new SimpleGrantedAuthority(permiso.getNombre())));
+
+
+
+
+        // USER es de springSecurity
+        return new User(
+                usuario.getNombre(),
+                usuario.getPassword(),
+                usuario.isEnabled(),
+                usuario.isAccountNonExpired(),
+                usuario.isCredentialsNonExpired(),
+                usuario.isAccountNonLocked(),
+                listAuthority
+        );
     }
 }

@@ -22,7 +22,8 @@ public class Profesional {
     @Column(name = "apellido")
     private String apellido;
 
-    @OneToOne(mappedBy = "profesional")
+    @OneToOne
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
     @OneToOne

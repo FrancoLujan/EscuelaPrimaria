@@ -5,10 +5,13 @@ import com.example.EscuelaPrimaria.dtos.salida.UsuarioDtoS;
 import com.example.EscuelaPrimaria.entities.security.Rol;
 import com.example.EscuelaPrimaria.entities.security.Usuario;
 
+import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.repositories.security.UsuarioRepository;
 import com.example.EscuelaPrimaria.services.interfaces.security.UsuarioService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,16 +21,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor                             // interface de spring security
+@AllArgsConstructor// interface de spring security:  UserDetailsService
+@Validated // para poder usar @Valid
+// cuando no se cumpla el @Valid lanza inplicitamente MethodArgumentNotValidException (no debo tratarlo)
 public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDetailsService {
     private final UsuarioRepository repo;
     private final RolServiceImpl rolService;
+    private final GestorConversionDto conversion;
 
     @Override
     public void add(Usuario entity) {
@@ -79,79 +87,74 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
         return new BCryptPasswordEncoder().encode(password);
     }
 
+    @Override
+    public boolean existsUsuarioByNombre(String nombre) {
+        return repo.existsUsuarioByNombre(nombre);
+    }
 
-    public void agregar(UsuarioDtoE usuarioDtoE) throws EntityExistsException {
-        if (usuarioDtoE.getNombre().isEmpty() || usuarioDtoE.getPassword().isEmpty() || usuarioDtoE.getMail().isEmpty()) {
-            throw new EntityExistsException("el usuario ya existe");
-        }
 
-        Optional<Usuario> usuario = findUsuarioByNombre(usuarioDtoE.getNombre());
-        if (usuario.isEmpty()) {
+    public void agregar(@Valid UsuarioDtoE usuarioDtoE) throws EntityExistsException, MethodArgumentNotValidException {
+        if (!existsUsuarioByNombre(usuarioDtoE.getNombre())) {
             Usuario usuarioNuevo = new Usuario();
             usuarioNuevo.setNombre(usuarioDtoE.getNombre());
             usuarioNuevo.setPassword(encriptarPassword(usuarioDtoE.getPassword()));
             usuarioNuevo.setMail(usuarioDtoE.getMail());
+            add(usuarioNuevo);
 
         } else {
-            throw new EntityExistsException("el usuario ya existe");
-        }
-    }
-
-    public void actualizarMail(Long id, String mail) throws EntityNotFoundException {
-        if (!mail.isEmpty()) {
-            Usuario usuario = findById(id);
-            usuario.setMail(mail);
-            update(usuario);
-        } else {
-            throw new EntityNotFoundException("El usuario no existe");
+            throw new EntityExistsException("El usuario ya existe");
         }
 
     }
 
-    public void actualizarPassword(Long id, String password) throws EntityNotFoundException {
-        if (!password.isEmpty()) {
-            Usuario usuario = findById(id);
-            usuario.setPassword(encriptarPassword(password));
-            update(usuario);
-        } else {
-            throw new EntityNotFoundException("El usuario no existe");
-        }
+    // esta limpio porque el mail se valida antes y al buscar el id puede lanzar un error...
+    // Se repite en todas las actualizaciones
+    public void actualizarMail(@Min(1) Long id, @NotNull @Email String mail) throws EntityNotFoundException {
+        Usuario usuario = findById(id);
+        usuario.setMail(mail);
+        update(usuario);
+
     }
 
-    public void actualizarNombre(Long id, String nombre) throws EntityNotFoundException {
-        if (!nombre.isEmpty()) {
-            Usuario usuario = findById(id);
-            usuario.setNombre(nombre);
-            update(usuario);
-        } else {
-            throw new EntityNotFoundException("El usuario no existe");
-        }
+    public void actualizarPassword(@Min(1) Long id, @Size(min = 5, max = 20) @NotBlank String password) throws EntityNotFoundException {
+        Usuario usuario = findById(id);
+        usuario.setPassword(encriptarPassword(password));
+        update(usuario);
+
+    }
+
+    public void actualizarNombre(@Min(1) Long id, @Size(min = 4, max = 10) @NotEmpty String nombre) throws EntityNotFoundException {
+        Usuario usuario = findById(id);
+        usuario.setNombre(nombre);
+        update(usuario);
+
     }
 
     // si usaras optional seria un poco mas simple pero solo un poco
-    public void eliminar(Long id) throws EntityNotFoundException {
-        if (id != null && id > 0) { // verificamos id porque no lo tomamos en cuenta en delete()
+
+    public void eliminar(@Min(1) Long id) throws EntityNotFoundException {
+        if (existsUsuarioByNombre(findById(id).getNombre())) {
             delete(id);
         } else {
             throw new EntityNotFoundException("El usuario no existe");
         }
+
+
     }
 
     public List<UsuarioDtoS> todos() {
         List<Usuario> usuarios = findAll();
-        ModelMapper modelMapper = new ModelMapper();
-        return usuarios.stream().map(e -> modelMapper.map(e, UsuarioDtoS.class)).toList();
+        return usuarios.stream().map(conversion::converterUsuarioDtoS).toList();
 
 
     }
 
-    public UsuarioDtoS buscarUsuario(Long id) throws EntityNotFoundException {
+    public UsuarioDtoS buscarUsuario(@Min(1) Long id) throws EntityNotFoundException {
         Usuario usuario = findById(id);
-        ModelMapper modelMapper = new ModelMapper();
-        return modelMapper.map(usuario, UsuarioDtoS.class);
+        return conversion.converterUsuarioDtoS(usuario);
     }
 
-    public void asociarRol(Long idUsuario, Long idRol) throws EntityNotFoundException {
+    public void asociarRol(@Min(1) Long idUsuario, @Min(1) Long idRol) throws EntityNotFoundException {
         Usuario usuario = findById(idUsuario);
         Rol rol = rolService.findById(idRol);
         usuario.getRoles().add(rol);
@@ -159,6 +162,7 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
     }
 
 
+    // tratar luego cuando ya tengas casi todo listo la seguridad...
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuario usuario = findUsuarioByNombre(username)
@@ -173,8 +177,6 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
         usuario.getRoles().stream()
                 .flatMap(role -> role.getPermisos().stream())
                 .forEach(permiso -> listAuthority.add(new SimpleGrantedAuthority(permiso.getNombre())));
-
-
 
 
         // USER es de springSecurity

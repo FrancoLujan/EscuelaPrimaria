@@ -19,6 +19,8 @@ import java.util.List;
 public class RolController {
     private final RolServiceImpl rolService;
 
+    // DEBERIAS CREAR UN METODO QUE BUSQUE POR NOMBRE ASI LO DEVUELVE..+
+    // TOTAL LOS ROLES COMO LOS PERMISOS SON RE ACOTADOS...
     @PostMapping("/crear/{rol}")
     public ResponseEntity<String> crear(@PathVariable String rol) {
         rolService.agregarRol(rol);

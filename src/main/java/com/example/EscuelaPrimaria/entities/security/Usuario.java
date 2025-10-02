@@ -41,11 +41,9 @@ public class Usuario {
     private List<Rol> roles;
 
 
-    @OneToOne
-    @JoinColumn(name = "cuil_profesional")
+    @OneToOne(mappedBy = "usuario")
     private Profesional profesional;
 
-    @OneToOne
-    @JoinColumn(name = "id_alumno")
+    @OneToOne(mappedBy = "usuario")
     private Alumno alumno;
 }

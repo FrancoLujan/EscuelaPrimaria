@@ -6,6 +6,7 @@ import com.example.EscuelaPrimaria.entities.domain.Grado;
 import com.example.EscuelaPrimaria.entities.domain.Profesional;
 import com.example.EscuelaPrimaria.entities.security.Permiso;
 import com.example.EscuelaPrimaria.entities.security.Rol;
+import com.example.EscuelaPrimaria.entities.security.Usuario;
 import com.example.EscuelaPrimaria.enums.PermisoEnum;
 import com.example.EscuelaPrimaria.enums.RolEnum;
 import org.modelmapper.ModelMapper;
@@ -67,6 +68,18 @@ public class GestorConversionDto {
         rolDtoS.setPermisos(listaPermisos);
         return rolDtoS;
     }
+
+    public UsuarioDtoS converterUsuarioDtoS(Usuario usuario) {
+        UsuarioDtoS usuarioDtoS = new UsuarioDtoS();
+        usuarioDtoS.setNombre(usuario.getNombre());
+        usuarioDtoS.setId(usuario.getId());
+        usuarioDtoS.setMail(usuario.getMail());
+        usuarioDtoS.setRol(usuario.getRoles().stream().map(this::converterRolDtoS).toList());
+        return usuarioDtoS;
+    }
+
+
+
     // OJO RESULTA QUE MAPPER LE CUESTA UN MONTON HACER MAPEOS SI HAY ATRIBUTOS NO PRIMITIVOS
     // ES MEJOR HACER CONVERSIONES A MANO SIEMPRE Y CUANDO SEAN COMPUESTAS...
     public PermisoDtoS converterPermisoDtoS(Permiso permiso) {

@@ -34,6 +34,7 @@ public class Alumno {
     @JsonBackReference
     private Grado grado;
 
-    @OneToOne(mappedBy = "alumno")
+    @OneToOne
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 }

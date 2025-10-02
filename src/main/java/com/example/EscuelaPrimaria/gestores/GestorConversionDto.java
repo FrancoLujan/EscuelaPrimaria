@@ -57,7 +57,6 @@ public class GestorConversionDto {
     }
 
     public RolDtoS converterRolDtoS(Rol rol) {
-        ModelMapper modelMapper = new ModelMapper();
         RolDtoS rolDtoS = new RolDtoS();
         rolDtoS.setRol(RolEnum.valueOf(rol.getNombre()));
 
@@ -70,7 +69,7 @@ public class GestorConversionDto {
     }
     // OJO RESULTA QUE MAPPER LE CUESTA UN MONTON HACER MAPEOS SI HAY ATRIBUTOS NO PRIMITIVOS
     // ES MEJOR HACER CONVERSIONES A MANO SIEMPRE Y CUANDO SEAN COMPUESTAS...
-    private PermisoDtoS converterPermisoDtoS(Permiso permiso) {
+    public PermisoDtoS converterPermisoDtoS(Permiso permiso) {
         PermisoDtoS permisoDto = new PermisoDtoS();
         permisoDto.setPermisoEnum(PermisoEnum.valueOf(permiso.getNombre()));
         return permisoDto;

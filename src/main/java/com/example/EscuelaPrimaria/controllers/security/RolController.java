@@ -19,8 +19,8 @@ import java.util.List;
 public class RolController {
     private final RolServiceImpl rolService;
 
-    @PostMapping("/crear")
-    public ResponseEntity<RolDtoE> crear(@RequestBody RolDtoE rol) {
+    @PostMapping("/crear/{rol}")
+    public ResponseEntity<String> crear(@PathVariable String rol) {
         rolService.agregarRol(rol);
         return ResponseEntity.status(HttpStatus.CREATED).body(rol);
 
@@ -48,11 +48,11 @@ public class RolController {
     @DeleteMapping("/eliminar/{idRol}")
     public ResponseEntity<String> eliminar(@PathVariable Long idRol) {
         rolService.eliminar(idRol);
-        return ResponseEntity.status(HttpStatus.OK).body("Rol eliminado exitosamente");
+        return ResponseEntity.status(HttpStatus.OK).body("Se a elimnado el rol ");
     }
     // se actualiza el nombre del rol(si hace cambiar RolEnum)
-    @PatchMapping("/actualizar/{idRol}")
-    public ResponseEntity<RolDtoS> actualizar( @RequestBody RolDtoE rol ,@PathVariable Long idRol) {
+    @PatchMapping("/actualizar/{idRol}/{rol}")
+    public ResponseEntity<RolDtoS> actualizar( @PathVariable String rol ,@PathVariable Long idRol) {
         rolService.actualizar(rol, idRol);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(rolService.buscarRol(idRol));
     }

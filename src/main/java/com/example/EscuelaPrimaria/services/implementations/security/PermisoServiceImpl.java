@@ -1,23 +1,26 @@
 package com.example.EscuelaPrimaria.services.implementations.security;
 
-import com.example.EscuelaPrimaria.dtos.entrada.PermisoDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.PermisoDtoS;
 import com.example.EscuelaPrimaria.entities.security.Permiso;
+import com.example.EscuelaPrimaria.enums.PermisoEnum;
+import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.repositories.security.PermisoRepository;
 import com.example.EscuelaPrimaria.services.interfaces.security.PermisoService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
+import org.apache.commons.lang3.EnumUtils;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
     private final PermisoRepository permisoRepository;
+    private GestorConversionDto conversionDto;
+    // PARA EVITAR TANTA COMPLICACION SE IRA EL DTO DE ENTRADA
 
     @Override
     public void add(Permiso entity) {
@@ -58,12 +61,19 @@ public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
         return permisoRepository.findPermisoByNombre(nombre);
     }
 
+
+    // RECORDAR EnumUtils.isValidEnum(PermisoEnum.class, CLASE PARA VALIDAR QUE ENUM)
     // No olvidar que la asignacion del permiso es en Rol
-    public void agregar(PermisoDtoE permisoDtoE) throws EntityExistsException {
-        if (!permisoDtoE.getPermiso().name().isEmpty() && !existsPermisoByNombre(permisoDtoE.getPermiso().name())) {
-            Permiso permiso = new Permiso();
-            permiso.setNombre(permisoDtoE.getPermiso().name());
-            permisoRepository.save(permiso);
+    public void agregar(String permisoE) throws EntityExistsException, HttpMessageNotReadableException {
+        if (!existsPermisoByNombre(permisoE)) {
+            if (EnumUtils.isValidEnum(PermisoEnum.class, permisoE)) {
+                Permiso permiso = new Permiso();
+                permiso.setNombre(permisoE);
+                add(permiso);
+            } else {
+                throw new IllegalArgumentException("Formato to valido");
+            }
+
         } else {
             throw new EntityExistsException("el permiso ya existe");
 
@@ -72,37 +82,44 @@ public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
     }
 
     // EL porque actualizar un permiso (el nombre del permiso)
-    public void actualizar(PermisoDtoE permisoDtoE) throws EntityNotFoundException {
-        if (existsPermisoByNombre(permisoDtoE.getPermiso().name()) && !permisoDtoE.getPermiso().name().isEmpty()) {
-            Permiso permiso = findByNombre(permisoDtoE.getPermiso().name());
-            permiso.setNombre(permisoDtoE.getPermiso().name());
-            permisoRepository.save(permiso);
+    public void actualizar(String viejoPermiso, String permisoNuevo) throws EntityNotFoundException , IllegalArgumentException{
+
+        if (existsPermisoByNombre(viejoPermiso.toUpperCase()) && !permisoNuevo.equals(viejoPermiso.toUpperCase())) {
+            if (EnumUtils.isValidEnum(PermisoEnum.class, permisoNuevo.toUpperCase())) {
+                Permiso permiso = findByNombre(viejoPermiso.toUpperCase());
+                permiso.setNombre(permisoNuevo.toUpperCase());
+                update(permiso);
+            }else{
+                throw new IllegalArgumentException("Formato to valido");
+            }
+
+
 
         } else {
-            throw new EntityExistsException("el permiso ya existe");
+            throw new EntityExistsException("el permiso no existe");
         }
 
 
     }
 
-    public void eliminar(Long id) throws EntityNotFoundException {
-        if (id > 0) {
-            Permiso permiso = findById(id); // lanza error al no encontrar
+    public void eliminar(String nombre) throws EntityNotFoundException {
+        if (existsPermisoByNombre(nombre)) {
+            Permiso permiso = findByNombre(nombre); // lanza error al no encontrar
             delete(permiso.getId());
-
         } else {
-            throw new EntityNotFoundException("el id no existe");
+            throw new EntityNotFoundException("el permiso no existe");
         }
 
 
     }
-    // esto deberia devolver un null si no se encuentra y un error si no se pasa bien el dto
-    public PermisoDtoS buscarPorNombre(PermisoDtoE permisoDtoE)throws EntityNotFoundException {
-        if(permisoDtoE.getPermiso().name().isEmpty()){
-            Permiso permiso = findByNombre(permisoDtoE.getPermiso().name());
-            ModelMapper model = new ModelMapper();
-           return  model.map(permiso, PermisoDtoS.class);
 
+    // CUIDADO CON ESTO , AL SER SIMPLES LOS PERMISOS BUSCO POR NOMBRE Y NO POR ID
+    // ES UNA DEUDA TECNICA QUE LUEGO CAMBIARIAS EN DTOS AGREGANDO ID...
+    public PermisoDtoS buscarPorNombre(String permisoE) throws EntityNotFoundException {
+        if (existsPermisoByNombre(permisoE.toUpperCase())) {
+            Permiso permiso = findByNombre(permisoE.toUpperCase());
+
+            return conversionDto.converterPermisoDtoS(permiso);
 
         }
         throw new EntityNotFoundException("el permiso no existe");
@@ -110,9 +127,8 @@ public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
 
     }
 
-    public List<PermisoDtoS> todos(){
-        ModelMapper model = new ModelMapper();
-        return findAll().stream().map(permiso -> model.map(permiso, PermisoDtoS.class)).toList();
+    public List<PermisoDtoS> todos() {
+        return findAll().stream().map(conversionDto::converterPermisoDtoS).toList();
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.EscuelaPrimaria.services.implementations.security;
 
 import com.example.EscuelaPrimaria.dtos.entrada.UsuarioDtoE;
+import com.example.EscuelaPrimaria.dtos.entrada.UsuarioDtoSeteo;
 import com.example.EscuelaPrimaria.dtos.salida.UsuarioDtoS;
 import com.example.EscuelaPrimaria.entities.security.Rol;
 import com.example.EscuelaPrimaria.entities.security.Usuario;
@@ -15,7 +16,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,9 +34,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor// interface de spring security:  UserDetailsService
+@AllArgsConstructor
 @Validated // para poder usar @Valid
-// cuando no se cumpla el @Valid lanza inplicitamente MethodArgumentNotValidException (no debo tratarlo)
+// cuando no se cumpla el @Valid lanza implicitamente MethodArgumentNotValidException (no debo tratarlo)
 public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDetailsService {
     private final UsuarioRepository repo;
     private final RolServiceImpl rolService;
@@ -101,6 +104,13 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
             usuarioNuevo.setNombre(usuarioDtoE.getNombre());
             usuarioNuevo.setPassword(encriptarPassword(usuarioDtoE.getPassword()));
             usuarioNuevo.setMail(usuarioDtoE.getMail());
+
+            // no olvidar seteo
+            usuarioNuevo.setEnabled(true);
+            usuarioNuevo.setAccountNotExpired(true);
+            usuarioNuevo.setAccountNotLocked(true);
+            usuarioNuevo.setCredentialsNotExpired(true);
+
             add(usuarioNuevo);
 
         } else {
@@ -108,6 +118,20 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
         }
 
     }
+
+
+    public void actualizarEstados(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long id
+            ,UsuarioDtoSeteo estados) {
+        Usuario usuario = findById(id);
+        usuario.setEnabled(estados.isEnabled());
+        usuario.setAccountNotExpired(estados.isAccountNotExpired());
+        usuario.setAccountNotLocked(estados.isAccountNotLocked());
+        usuario.setCredentialsNotExpired(estados.isCredentialsNotExpired());
+        update(usuario);
+
+
+    }
+
 
     // esta limpio porque el mail se valida antes y al buscar el id puede lanzar un error...
     // Se repite en todas las actualizaciones
@@ -175,14 +199,15 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
         update(usuario);
 
     }
-
-
     // tratar luego cuando ya tengas casi todo listo la seguridad...
+    // GRACIAS A ESTO PUEDO MENEJAR EN LOS CONTROLLERS LOS PERMISOS Y LOS ROLES DE CADA ENPOINT COMO QUIERA
+    // puedo usar la granularidad que se me antoje...
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuario usuario = findUsuarioByNombre(username)
                 .orElseThrow(() -> new UsernameNotFoundException("El usuario no existe"));
         // manejar permisos
+
         List<SimpleGrantedAuthority> listAuthority = new ArrayList<>();
 
         // CONVERTIMOS LOS ROLES
@@ -193,16 +218,17 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
                 .flatMap(role -> role.getPermisos().stream())
                 .forEach(permiso -> listAuthority.add(new SimpleGrantedAuthority(permiso.getNombre())));
 
-
         // USER es de springSecurity
         return new User(
                 usuario.getNombre(),
                 usuario.getPassword(),
                 usuario.isEnabled(),
-                usuario.isAccountNonExpired(),
-                usuario.isCredentialsNonExpired(),
-                usuario.isAccountNonLocked(),
+                usuario.isAccountNotExpired(),
+                usuario.isCredentialsNotExpired(),
+                usuario.isAccountNotLocked(),
                 listAuthority
         );
     }
+
+
 }

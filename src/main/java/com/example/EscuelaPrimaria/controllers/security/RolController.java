@@ -16,6 +16,7 @@ import java.util.List;
 @RequestMapping("/api/v1/Rol")
 @AllArgsConstructor
 
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class RolController {
     private final RolServiceImpl rolService;
 

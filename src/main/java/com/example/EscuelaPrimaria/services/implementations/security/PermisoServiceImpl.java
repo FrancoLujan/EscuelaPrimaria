@@ -3,20 +3,25 @@ package com.example.EscuelaPrimaria.services.implementations.security;
 import com.example.EscuelaPrimaria.dtos.salida.PermisoDtoS;
 import com.example.EscuelaPrimaria.entities.security.Permiso;
 import com.example.EscuelaPrimaria.enums.PermisoEnum;
+import com.example.EscuelaPrimaria.errors.MensajeErrorValidaciones;
 import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.repositories.security.PermisoRepository;
 import com.example.EscuelaPrimaria.services.interfaces.security.PermisoService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Validated
 public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
     private final PermisoRepository permisoRepository;
     private GestorConversionDto conversionDto;
@@ -64,7 +69,7 @@ public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
 
     // RECORDAR EnumUtils.isValidEnum(PermisoEnum.class, CLASE PARA VALIDAR QUE ENUM)
     // No olvidar que la asignacion del permiso es en Rol
-    public void agregar(String permisoE) throws EntityExistsException, HttpMessageNotReadableException {
+    public void agregar(@NotNull @NotBlank(message = MensajeErrorValidaciones.MENSAJE_NOMBRE) String permisoE) throws EntityExistsException, HttpMessageNotReadableException {
         if (!existsPermisoByNombre(permisoE)) {
             if (EnumUtils.isValidEnum(PermisoEnum.class, permisoE)) {
                 Permiso permiso = new Permiso();
@@ -82,7 +87,8 @@ public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
     }
 
     // EL porque actualizar un permiso (el nombre del permiso)
-    public void actualizar(String viejoPermiso, String permisoNuevo) throws EntityNotFoundException , IllegalArgumentException{
+    public void actualizar(@NotNull @NotBlank(message = MensajeErrorValidaciones.MENSAJE_NOMBRE) String viejoPermiso,
+                          @NotNull @NotBlank(message = MensajeErrorValidaciones.MENSAJE_NOMBRE) String permisoNuevo) throws EntityNotFoundException , IllegalArgumentException{
 
         if (existsPermisoByNombre(viejoPermiso.toUpperCase()) && !permisoNuevo.equals(viejoPermiso.toUpperCase())) {
             if (EnumUtils.isValidEnum(PermisoEnum.class, permisoNuevo.toUpperCase())) {
@@ -102,7 +108,7 @@ public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
 
     }
 
-    public void eliminar(String nombre) throws EntityNotFoundException {
+    public void eliminar(@NotNull @NotBlank(message = MensajeErrorValidaciones.MENSAJE_NOMBRE) String nombre) throws EntityNotFoundException {
         if (existsPermisoByNombre(nombre)) {
             Permiso permiso = findByNombre(nombre); // lanza error al no encontrar
             delete(permiso.getId());
@@ -115,7 +121,7 @@ public class PermisoServiceImpl implements PermisoService<Permiso, Long> {
 
     // CUIDADO CON ESTO , AL SER SIMPLES LOS PERMISOS BUSCO POR NOMBRE Y NO POR ID
     // ES UNA DEUDA TECNICA QUE LUEGO CAMBIARIAS EN DTOS AGREGANDO ID...
-    public PermisoDtoS buscarPorNombre(String permisoE) throws EntityNotFoundException {
+    public PermisoDtoS buscarPorNombre(@NotNull @NotBlank(message = MensajeErrorValidaciones.MENSAJE_NOMBRE)  String permisoE) throws EntityNotFoundException {
         if (existsPermisoByNombre(permisoE.toUpperCase())) {
             Permiso permiso = findByNombre(permisoE.toUpperCase());
 

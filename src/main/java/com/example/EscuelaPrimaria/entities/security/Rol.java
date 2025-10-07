@@ -20,7 +20,7 @@ public class Rol {
     @Column(nullable = false, unique = true, name ="rol")
     private String nombre;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "rol_usuario",
             joinColumns = @JoinColumn(name = "id_rol"),
@@ -29,8 +29,9 @@ public class Rol {
     )
     private List<Usuario> usuarios;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
+
             name = "rol_permisos",
             joinColumns = @JoinColumn(name = "id_rol"),
             inverseJoinColumns = @JoinColumn(name = "id_permiso")

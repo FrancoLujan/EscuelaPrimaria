@@ -21,9 +21,9 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private boolean accountNonExpired;
-    private boolean accountNonLocked;
-    private boolean credentialsNonExpired;
+    private boolean accountNotExpired;
+    private boolean accountNotLocked;
+    private boolean credentialsNotExpired;
     private boolean enabled;
 
     @Column(unique = true, name = "nombre_usuario", nullable = false)
@@ -37,7 +37,7 @@ public class Usuario {
     private String mail;
 
 
-    @ManyToMany(mappedBy = "usuarios")
+    @ManyToMany(mappedBy = "usuarios", fetch = FetchType.EAGER)
     private List<Rol> roles;
 
 

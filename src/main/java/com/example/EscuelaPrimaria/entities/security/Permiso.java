@@ -21,6 +21,6 @@ public class Permiso {
     @Column(name = "nombre")
     private String nombre;
 
-    @ManyToMany(mappedBy = "permisos")
+    @ManyToMany(mappedBy = "permisos", fetch = FetchType.EAGER)
     private List<Rol> roles;
 }

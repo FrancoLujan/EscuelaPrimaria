@@ -1,12 +1,14 @@
 package com.example.EscuelaPrimaria.controllers.security;
 
 import com.example.EscuelaPrimaria.dtos.entrada.UsuarioDtoE;
+import com.example.EscuelaPrimaria.dtos.entrada.UsuarioDtoSeteo;
 import com.example.EscuelaPrimaria.dtos.salida.UsuarioDtoS;
 import com.example.EscuelaPrimaria.services.implementations.security.UsuarioServiceImpl;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,8 +16,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/Usuario")
 @AllArgsConstructor
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class UsuarioController {
     private final UsuarioServiceImpl usuarioService;
+
 
     @PostMapping("/crear")
     public ResponseEntity<String> crear(@Valid @RequestBody UsuarioDtoE usuarioDto){
@@ -64,5 +68,13 @@ public class UsuarioController {
     public ResponseEntity<UsuarioDtoS> asignarUsuario(@PathVariable Long idUsuario, @PathVariable Long idRol) {
         usuarioService.asociarRol(idUsuario, idRol);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(usuarioService.buscarUsuario(idUsuario));
+    }
+
+    @PatchMapping("/actualizar/estado/{idUsuario}/")
+    public ResponseEntity<String> actualizarEstado(@PathVariable Long idUsuario, @RequestBody UsuarioDtoSeteo estados) {
+        usuarioService.actualizarEstados(idUsuario, estados);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Estados actualizado");
+
+
     }
 }

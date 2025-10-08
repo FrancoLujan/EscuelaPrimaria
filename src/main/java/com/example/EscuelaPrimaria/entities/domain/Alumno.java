@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -27,7 +28,7 @@ public class Alumno {
     private Long cuil;
 
     @Column(name = "fechaDeNacimiento")
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     @ManyToOne
     @JoinColumn(name = "id_grado")

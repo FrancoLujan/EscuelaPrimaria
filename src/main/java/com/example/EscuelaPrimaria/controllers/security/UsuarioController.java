@@ -64,6 +64,7 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Usuario eliminado");
     }
 
+    // Cuando se asigna un rol dependiendo del rol se creara por ejemplo un alumno
     @PatchMapping("/asignar/usuario/{idUsuario}/rol/{idRol}")
     public ResponseEntity<UsuarioDtoS> asignarUsuario(@PathVariable Long idUsuario, @PathVariable Long idRol) {
         usuarioService.asociarRol(idUsuario, idRol);

@@ -22,4 +22,5 @@ public class UsuarioDtoE {
     @NotBlank
     @Size(min = 5, max = 20 ,message = "password muy pequeño o largo ")
     private String password;
+
 }

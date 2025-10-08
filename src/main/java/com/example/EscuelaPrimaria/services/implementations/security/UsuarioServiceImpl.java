@@ -8,6 +8,7 @@ import com.example.EscuelaPrimaria.entities.security.Usuario;
 import com.example.EscuelaPrimaria.errors.MensajeErrorValidaciones;
 import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.repositories.security.UsuarioRepository;
+import com.example.EscuelaPrimaria.services.implementations.domain.AlumnoServiceImpl;
 import com.example.EscuelaPrimaria.services.interfaces.security.UsuarioService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,10 +16,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,12 +24,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 @AllArgsConstructor
@@ -41,6 +38,8 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
     private final UsuarioRepository repo;
     private final RolServiceImpl rolService;
     private final GestorConversionDto conversion;
+    private final AlumnoServiceImpl alumnoService;
+    //private final ProfesionalServiceImpl profesionalService;
 
     @Override
     public void add(Usuario entity) {
@@ -120,8 +119,8 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
     }
 
 
-    public void actualizarEstados(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long id
-            ,UsuarioDtoSeteo estados) {
+    public void actualizarEstados(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long id
+            , UsuarioDtoSeteo estados) {
         Usuario usuario = findById(id);
         usuario.setEnabled(estados.isEnabled());
         usuario.setAccountNotExpired(estados.isAccountNotExpired());
@@ -135,7 +134,7 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
 
     // esta limpio porque el mail se valida antes y al buscar el id puede lanzar un error...
     // Se repite en todas las actualizaciones
-    public void actualizarMail(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long id,
+    public void actualizarMail(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long id,
                                @Email(message = MensajeErrorValidaciones.MENSAJE_EMAIL) String mail)
             throws EntityNotFoundException, ConstraintViolationException {
 
@@ -145,7 +144,7 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
 
     }
 
-    public void actualizarPassword(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long id,
+    public void actualizarPassword(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long id,
                                    @Size(min = 5, max = 20, message = MensajeErrorValidaciones.MENSAJE_PASSWORD)
                                    @NotBlank String password) throws EntityNotFoundException, ConstraintViolationException {
         Usuario usuario = findById(id);
@@ -154,7 +153,7 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
 
     }
 
-    public void actualizarNombre(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long id,
+    public void actualizarNombre(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long id,
                                  @Size(min = 4, max = 10, message = MensajeErrorValidaciones.MENSAJE_NOMBRE) @NotEmpty String nombre)
             throws EntityNotFoundException, ConstraintViolationException {
         Usuario usuario = findById(id);
@@ -164,9 +163,12 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
     }
 
     // si usaras optional seria un poco mas simple pero solo un poco
-
-    public void eliminar(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long id) throws EntityNotFoundException, ConstraintViolationException {
+    // recorda que esta involucrado por una tabla intermedia con rol por ende
+    // en el rol elimino los usuarios ... ES MUY IMPORTANTE
+    public void eliminar(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long id) throws EntityNotFoundException, ConstraintViolationException {
         if (existsUsuarioByNombre(findById(id).getNombre())) {
+            Usuario usuario = findById(id);
+            usuario.getRoles().forEach(rol -> {rol.getUsuarios().remove(usuario);});
             delete(id);
         } else {
             throw new EntityNotFoundException("El usuario no existe");
@@ -182,23 +184,37 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
 
     }
 
-    public UsuarioDtoS buscarUsuario(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long id)
+    public UsuarioDtoS buscarUsuario(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long id)
             throws EntityNotFoundException, ConstraintViolationException {
         Usuario usuario = findById(id);
         return conversion.converterUsuarioDtoS(usuario);
     }
 
     // cuidado Esto tendria QUE ESTAR EN el servicio de roles (por como estan las relaciones de las tablas...)
-    public void asociarRol(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long idUsuario,
-                           @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long idRol) throws EntityNotFoundException, ConstraintViolationException {
+    public void asociarRol(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idUsuario,
+                           @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idRol) throws EntityNotFoundException, ConstraintViolationException {
         Usuario usuario = findById(idUsuario);
         Rol rol = rolService.findById(idRol);
         usuario.getRoles().add(rol);
         rol.getUsuarios().add(usuario);
         rolService.update(rol);
         update(usuario);
+        asociarEntidad(usuario.getId());
+
 
     }
+
+    // USO CUANDO ASOCIO EL ROL
+    private void asociarEntidad(Long id) {
+        Usuario usuario = findById(id);
+        usuario.getRoles().forEach(rol -> {
+            if (rol.getNombre().equalsIgnoreCase("ALUMNO")) {
+                alumnoService.crearAlumnoVacio(usuario); // CREAR UN ALUMNO VACIO pero con usuario
+            } // luego agregar el de profesional....
+        });
+
+    }
+
     // tratar luego cuando ya tengas casi todo listo la seguridad...
     // GRACIAS A ESTO PUEDO MENEJAR EN LOS CONTROLLERS LOS PERMISOS Y LOS ROLES DE CADA ENPOINT COMO QUIERA
     // puedo usar la granularidad que se me antoje...

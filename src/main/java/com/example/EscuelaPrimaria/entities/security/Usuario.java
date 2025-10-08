@@ -41,9 +41,9 @@ public class Usuario {
     private List<Rol> roles;
 
 
-    @OneToOne(mappedBy = "usuario")
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE)
     private Profesional profesional;
 
-    @OneToOne(mappedBy = "usuario")
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE)
     private Alumno alumno;
 }

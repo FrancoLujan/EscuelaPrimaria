@@ -1,6 +1,5 @@
 package com.example.EscuelaPrimaria.services.implementations.security;
 
-import com.example.EscuelaPrimaria.dtos.entrada.RolDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.RolDtoS;
 import com.example.EscuelaPrimaria.entities.security.Permiso;
 import com.example.EscuelaPrimaria.entities.security.Rol;
@@ -11,7 +10,6 @@ import com.example.EscuelaPrimaria.repositories.security.RolRepository;
 import com.example.EscuelaPrimaria.services.interfaces.security.RolService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -85,7 +83,7 @@ public class RolServiceImpl implements RolService<Rol, Long> {
 
     }
 
-    public void eliminar(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long id) throws EntityNotFoundException {
+    public void eliminar(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long id) throws EntityNotFoundException {
 
         if (existsRolByNombre(findById(id).getNombre())) {
             delete(id);
@@ -95,7 +93,7 @@ public class RolServiceImpl implements RolService<Rol, Long> {
     }
 
     public void actualizar(@NotNull @NotBlank(message = MensajeErrorValidaciones.MENSAJE_NOMBRE)  String rolE,
-                           @Min(value = 1) Long idRol) throws EntityNotFoundException, IllegalArgumentException {
+                           @Min(value = 1 , message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idRol) throws EntityNotFoundException, IllegalArgumentException {
         if (existsRolByNombre(rolE.toUpperCase())) {
             if (EnumUtils.isValidEnum(RolEnum.class, rolE.toUpperCase())) {
                 Rol rol = findById(idRol);
@@ -119,14 +117,14 @@ public class RolServiceImpl implements RolService<Rol, Long> {
 
     }
 
-    public RolDtoS buscarRol(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long id) throws EntityNotFoundException {
+    public RolDtoS buscarRol(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long id) throws EntityNotFoundException {
         Rol rol = findById(id);
         return conversor.converterRolDtoS(rol);
     }
 
 
-    public void asociarPermisos(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long idRol,
-                                @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_ID) Long idPermiso) throws EntityNotFoundException {
+    public void asociarPermisos(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idRol,
+                                @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idPermiso) throws EntityNotFoundException {
         Rol rol = findById(idRol);
         Permiso permiso = permisoServiceImpl.findById(idPermiso);
         if (rol.getPermisos().contains(permiso)) {

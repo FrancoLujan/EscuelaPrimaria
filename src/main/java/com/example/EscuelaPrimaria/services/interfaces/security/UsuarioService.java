@@ -8,4 +8,5 @@ public interface UsuarioService<T,K> extends Crud<T,K> {
     Optional<T> findUsuarioByNombre(String nombre);
     String encriptarPassword(String password);
     boolean existsUsuarioByNombre(String nombre);
+
 }

@@ -3,79 +3,122 @@ package com.example.EscuelaPrimaria.services.implementations.domain;
 import com.example.EscuelaPrimaria.dtos.entrada.AlumnoDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.AlumnoDtoS;
 import com.example.EscuelaPrimaria.entities.domain.Alumno;
+import com.example.EscuelaPrimaria.entities.security.Usuario;
+import com.example.EscuelaPrimaria.errors.MensajeErrorValidaciones;
 import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 
-import com.example.EscuelaPrimaria.gestores.GestorRepositoryDomain;
+import com.example.EscuelaPrimaria.repositories.domain.AlumnoRepository;
 import com.example.EscuelaPrimaria.services.interfaces.domain.AlumnoService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.aspectj.weaver.ast.Not;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Validated
+@AllArgsConstructor
+
+
 public class AlumnoServiceImpl implements AlumnoService<Alumno, Long> {
-    private GestorRepositoryDomain gestorRepo;
+    private AlumnoRepository repository;
     private GestorConversionDto gestorConversionDto;
 
     @Override
     public void add(Alumno entity) {
-        gestorRepo.getAlumnoRepository().save(entity);
+        repository.save(entity);
 
     }
 
     @Override
     public void update(Alumno entity) {
-        gestorRepo.getAlumnoRepository().save(entity);
+        repository.save(entity);
 
     }
 
     @Override
     public void delete(Long id) {
-        gestorRepo.getAlumnoRepository().deleteById(id);
+        repository.deleteById(id);
 
     }
 
     @Override
     public List<Alumno> findAll() {
-        return gestorRepo.getAlumnoRepository().findAll();
+        return repository.findAll();
     }
 
     @Override
-    // POR CUERENCIA USO EL CUIL QUE ES UN ELEMENTO IRREPETIBLE (EN EL FUTURO CAMBIAR PK) O
-    // CREAR UN METODO EN REPOSITORY QUE ME TRAIGA EL ID PASANDO EL CUIL
-    // SIN EMBARGO EL METODO QUE IMPLEMENTA LA BUSQUEDA, BUSCA POR CUIL A LA ENTIDAD Y LUEGO PASA EL ID DE LA ENTIDAD
     public Alumno findById(Long id) {
-        return gestorRepo.getAlumnoRepository().findById(id).orElse(null);
+
+        return repository
+                .findById(id).orElseThrow(() -> new EntityNotFoundException("Alumno no existe"));
     }
 
     @Override
     public Alumno findAlumnoByCuil(Long cuil) {
-        return gestorRepo.getAlumnoRepository().findAlumnoByCuil(cuil);
+
+        return repository.findAlumnoByCuil(cuil);
     }
 
-    public void agregarAlumno(AlumnoDtoE alumno) throws EntityExistsException {
-        if (alumno.getCuil() != null &&
-                findAlumnoByCuil(alumno.getCuil()) == null) {
-            ModelMapper modelMapper = new ModelMapper();
-            Alumno entity = modelMapper.map(alumno, Alumno.class);
-            add(entity);
-        } else {
-            throw new EntityExistsException("El alumno ya existe");
+    @Override
+    public boolean existsAlumnoByCuil(Long cuil) {
+        return repository.existsAlumnoByCuil(cuil);
+    }
+
+    @Override
+    // damos por hecho que existira siempre porque este metodo se usara con el actualiar que se hace luego de la creacion
+    // de usuario
+    public Alumno findAlumnoByUsuario_Id(Long idUsuario) {
+        return  repository.findAlumnoByUsuario_Id(idUsuario);
+    }
+
+    // AL CREAR VACIO, PUEDO CREARLO UNA VEZ CREADO Y EL USUARIO LUEGO SETEO
+    public void crearAlumnoVacio(Usuario usuario) throws EntityExistsException {
+        Alumno alumno = new Alumno();
+        alumno.setUsuario(usuario);
+        if(!existsAlumnoByCuil(alumno.getCuil())) {
+
+            add(alumno);
+        }else {
+            throw new EntityExistsException("Alumno ya existe");
         }
-
     }
+    // mediante el ID esta actualizacion debe realizarce de inmediato se crea el usuario...
+    public void actualizar(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idUsuario ,
+                           @Valid AlumnoDtoE alumno) throws EntityNotFoundException {
 
-    public void actualizar(AlumnoDtoE alumno) throws EntityNotFoundException {
-        if (findAlumnoByCuil(alumno.getCuil()) != null) {
-
-            Alumno alumnoE = findAlumnoByCuil(alumno.getCuil());
+            Alumno alumnoE = findAlumnoByUsuario_Id(idUsuario);
             alumnoE.setCuil(alumno.getCuil());
             alumnoE.setNombre(alumno.getNombre());
             alumnoE.setApellido(alumno.getApellido());
             alumnoE.setFechaNacimiento(alumno.getFechaNacimiento());
+
+            update(alumnoE);
+
+
+    }
+
+
+// ESTE ACTULIZAR TENES QUE MODIFICAR ESTE ES EL NORMAL
+    public void actualizarExistente(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long cuil ,
+                           @Valid AlumnoDtoE alumno) throws EntityNotFoundException {
+
+        if (existsAlumnoByCuil(cuil)) {
+            Alumno alumnoE = findAlumnoByCuil(cuil);
+            alumnoE.setCuil(alumno.getCuil());
+            alumnoE.setNombre(alumno.getNombre());
+            alumnoE.setApellido(alumno.getApellido());
+            alumnoE.setFechaNacimiento(alumno.getFechaNacimiento());
+
             update(alumnoE);
         } else {
             throw new EntityNotFoundException("El alumno no existe");
@@ -83,8 +126,8 @@ public class AlumnoServiceImpl implements AlumnoService<Alumno, Long> {
 
     }
 
-    public void eliminarAlumno(Long cuil) throws EntityNotFoundException {
-        if (findAlumnoByCuil(cuil) != null) {
+    public void eliminar(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long cuil) throws EntityNotFoundException {
+        if (existsAlumnoByCuil(cuil)) {
             delete(cuil);
         } else {
             throw new EntityNotFoundException("El alumno no existe");
@@ -93,16 +136,14 @@ public class AlumnoServiceImpl implements AlumnoService<Alumno, Long> {
     }
 
     public List<AlumnoDtoS> todos() {
-        ModelMapper modelMapper = new ModelMapper();
         List<Alumno> alumnos = findAll();
         return alumnos.stream().map(e -> gestorConversionDto.converterAlumnDtoS(e))
                 .collect(Collectors.toList());
 
     }
 
-    public AlumnoDtoS buscarAlumnoPorCuil(Long cuil) throws EntityNotFoundException {
-        ModelMapper modelMapper = new ModelMapper();
-        if (findAlumnoByCuil(cuil) != null) {
+    public AlumnoDtoS buscarAlumnoPorCuil(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long cuil) throws EntityNotFoundException {
+        if (existsAlumnoByCuil(cuil)) {
             return gestorConversionDto.converterAlumnDtoS(findAlumnoByCuil(cuil));
 
         } else {
@@ -110,6 +151,8 @@ public class AlumnoServiceImpl implements AlumnoService<Alumno, Long> {
         }
 
     }
+
+
 
 
 }

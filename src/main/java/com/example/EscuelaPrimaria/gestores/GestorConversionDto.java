@@ -27,14 +27,13 @@ public class GestorConversionDto {
     // conversion a mano por el tema de mostrar la edad...
     public AlumnoDtoS converterAlumnDtoS(Alumno alumno) {
         AlumnoDtoS alumnoDto = new AlumnoDtoS();
-        ModelMapper modelMapper = new ModelMapper();
         LocalDate localDate = LocalDate.now();
 
         int edad = localDate.getYear() - alumno.getFechaNacimiento().getYear();
         alumnoDto.setApellido(alumno.getApellido());
         alumnoDto.setNombre(alumno.getNombre());
         alumnoDto.setEdad(edad);
-        alumnoDto.setGrado(converterGradoDtoS(alumno.getGrado()));
+        alumnoDto.setGrado(alumnoDto.getGrado());
         return alumnoDto;
     }
 

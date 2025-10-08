@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     TODO LO QUE MANEJE ENUMS TENGO QUE VALIDAR ESE ERROR DE ESA MANERA
     PUEDO EVITAR ERRORES DE MAPEO CON ENUMS
      */
-    // SE CAMBIO A BAD_REQUEST es mas general porque asi es tratado en los servicios con el mesaje
+    // SE CAMBIO A BAD_REQUEST es mas general porque asi es tratado en los servicios con el mensaje
     // 'Formato no valido'
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<MensajeError> handleParseException(IllegalArgumentException e) {
@@ -63,8 +63,8 @@ public class GlobalExceptionHandler {
 
      @ExceptionHandler(UsernameNotFoundException.class)
      public ResponseEntity<MensajeError> handleUsernameNotFoundException(UsernameNotFoundException e) {
-        MensajeError mensajeError = new MensajeError(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mensajeError);
+        MensajeError mensajeError = new MensajeError(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensajeError);
      }
 
     @ExceptionHandler(Exception.class) // errores no controlados GENERALES

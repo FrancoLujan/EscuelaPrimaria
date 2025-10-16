@@ -7,10 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class TurnoDtoE {
-    @Enumerated(EnumType.STRING)
-    private TurnoEnum nombre;
+    private String nombre;
 }

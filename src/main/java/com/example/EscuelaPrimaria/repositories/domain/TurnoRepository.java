@@ -8,5 +8,6 @@ import java.util.TreeSet;
 
 @Repository
 public interface TurnoRepository extends JpaRepository<Turno, Long> {
-    TreeSet<Turno> findByNombre(String nombre);
+    //TreeSet<Turno> findByNombre(String nombre);
+    Turno findByNombre(String nombre);
 }

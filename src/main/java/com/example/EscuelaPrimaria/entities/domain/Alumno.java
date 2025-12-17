@@ -7,12 +7,13 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Setter @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Alumno {
+public class  Alumno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +39,10 @@ public class Alumno {
     @OneToOne
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
+
+
+    @ManyToMany(mappedBy = "alumnos")
+    private List<Prueba> pruebas;
+
+
 }

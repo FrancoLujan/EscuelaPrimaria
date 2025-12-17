@@ -21,7 +21,7 @@ public class Grado {
     private Long id;
 
     @Column(name = "nivel", unique = true, nullable = false)
-    private int nivel;
+    private Long nivel;
 
     @OneToOne(mappedBy = "grado")
     private Turno turno;

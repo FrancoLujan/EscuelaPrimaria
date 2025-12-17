@@ -7,20 +7,36 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Setter @Getter
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class  Materia {
+public class Materia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id ;
+    private Long id;
 
     @Column(name = "nombre")
     private String nombre;
 
-    @Column(name = "nota")
-    private int nota;
+    @Column(name = "promedio")
+    private Integer promedio;
+
+   /*
+   Tabla intermedia con prueba
+    */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "materia_prueba",
+            joinColumns = @JoinColumn(name = "id_materia"),
+            inverseJoinColumns = @JoinColumn(name = "id_prueba")
+    )
+    private List<Prueba> pruebas = new ArrayList<>(3);
+
 
     @ManyToOne
     @JoinColumn(name = "id_grado")

@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/Materia")
 @AllArgsConstructor
-@PreAuthorize("permitAll()")
+@PreAuthorize("hasRole(DIRECTOR)")
 public class MateriaController {
     final private MateriaServiceImpl servicio;
 

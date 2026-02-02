@@ -1,5 +1,6 @@
 package com.example.EscuelaPrimaria.entities.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,12 +8,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Table(name = "TURNOS")
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+/// SUBIR CAMBIOS DE TABLAS
+// BORRASTE LOS USUARIOS aaaa
+
 public class Turno {
 
     @Id
@@ -28,7 +33,7 @@ public class Turno {
     @Column(name = "horaFin")
     private LocalTime horaFin;
 
-    @OneToOne
-    @JoinColumn(name = "id_grado")
-    private Grado grado;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "turno")
+    private List<Grado> grado;
 }

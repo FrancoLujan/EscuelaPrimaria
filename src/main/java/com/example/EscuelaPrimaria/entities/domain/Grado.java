@@ -1,5 +1,6 @@
 package com.example.EscuelaPrimaria.entities.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,10 +21,12 @@ public class Grado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nivel", unique = true, nullable = false)
+    @Column(name = "nivel")
     private Long nivel;
 
-    @OneToOne(mappedBy = "grado")
+    @ManyToOne
+    @JoinColumn(name = "id_turno")
+    @JsonBackReference
     private Turno turno;
 
     @OneToOne(mappedBy = "grado")

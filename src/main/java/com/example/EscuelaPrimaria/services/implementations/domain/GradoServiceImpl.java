@@ -1,17 +1,30 @@
 package com.example.EscuelaPrimaria.services.implementations.domain;
 
 import com.example.EscuelaPrimaria.dtos.entrada.GradoDtoE;
+import com.example.EscuelaPrimaria.dtos.entrada.ProfesionalDtoE;
 import com.example.EscuelaPrimaria.dtos.salida.GradoDtoS;
 import com.example.EscuelaPrimaria.entities.domain.Grado;
+import com.example.EscuelaPrimaria.entities.domain.Profesional;
 import com.example.EscuelaPrimaria.entities.domain.Turno;
+import com.example.EscuelaPrimaria.enums.TurnoEnum;
+import com.example.EscuelaPrimaria.errors.MensajeErrorValidaciones;
 import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
-import com.example.EscuelaPrimaria.gestores.GestorRepositoryDomain;
+import com.example.EscuelaPrimaria.repositories.domain.GradoRepository;
 import com.example.EscuelaPrimaria.services.interfaces.domain.GradoService;
+import com.example.EscuelaPrimaria.services.interfaces.domain.TurnoService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.EnumUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -20,121 +33,132 @@ import java.util.List;
 public class GradoServiceImpl implements GradoService<Grado, Long> {
 
 
-    private final GestorRepositoryDomain gestor;
+    private final GradoRepository repository;
     private final GestorConversionDto gestorConversionDto;
+    private final TurnoServiceImpl turnoService;
+    private final ProfesionalServiceImpl profesionalService;
 
     @Override
     public void add(Grado entity) {
-        gestor.getGradoRepository().save(entity);
+        repository.save(entity);
 
     }
 
     @Override
     public void update(Grado entity) {
-        gestor.getGradoRepository().save(entity);
+        repository.save(entity);
 
     }
 
     @Override
     public void delete(Long id) {
-        gestor.getGradoRepository().deleteById(id);
+        repository.deleteById(id);
 
     }
 
     @Override
     public List<Grado> findAll() {
-        return gestor.getGradoRepository().findAll();
+
+        return repository.findAll();
     }
 
     @Override
     public Grado findById(Long id) {
-        return gestor.getGradoRepository().findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("no se encontro grado con el id:" + id));
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("no se encontro el grado :" + id));
     }
 
 
     @Override
     public boolean existsGradoByNivel(Long nivel) {
-        return gestor.getGradoRepository().existsGradoByNivel(nivel);
+        return repository.existsGradoByNivel(nivel);
     }
 
     @Override
-    public boolean existsGradoByTurno_Nombre(String turno) {
-        return gestor.getGradoRepository().existsGradoByTurno_Nombre(turno);
+    public boolean existsGradoByTurno_Id(Long turnoId) {
+        return repository.existsGradoByTurno_Id(turnoId);
     }
+
 
     @Override
     public Grado findByGradoByNivel(Long nivel, String turno) {
-        return gestor.getGradoRepository().findGradoBynivel_AndTurno_Nombre(nivel, turno);
+        return repository.findGradoBynivel_AndTurno_Nombre(nivel, turno);
     }
 
 
     @Override
     public List<Grado> findGradoByNivel(Long nivel) {
-        return gestor.getGradoRepository().findGradoByNivel(nivel);
+        return repository.findGradoByNivel(nivel);
     }
 
 
-    public void agregarGrado(GradoDtoE grado) throws EntityExistsException {
+    public void agregarGrado(@Valid GradoDtoE gradoDtoE) throws EntityExistsException {
+        if(!existenciaGrado(gradoDtoE)){
+            Grado grado = new Grado();
+            grado.setNivel(gradoDtoE.getNivel());
+            grado.setTurno(turnoService.findByNombre(gradoDtoE.getTurno().name()));
+            add(grado);
 
-        if (!existenciaGrado(grado)) {
-            ModelMapper modelMapper = new ModelMapper();
-            Grado gradoEntity = modelMapper.map(grado, Grado.class);
-            add(gradoEntity);
-        } else {
-            throw new EntityExistsException("El grado existe en el sistema");
+        }
+        else {
+            throw new EntityExistsException("El grado ya existe en el sistema");
         }
 
+
     }
 
-    public void actualizarGrado(GradoDtoE grado) throws EntityNotFoundException {
+    // se hace de manera inmediata para asignar profe
+    public void actualizarGrado(@Valid GradoDtoE gradoDtoE,
+                               @Valid ProfesionalDtoE profesionalDtoE) throws EntityNotFoundException {
 
-        if (existenciaGrado(grado)) {
-            ModelMapper modelMapper = new ModelMapper();
-            Grado gradoE = findByGradoByNivel((long) grado.getNivel().getValor(), grado.getTurno().getNombre().name());
-            gradoE.setTurno(modelMapper.map(grado.getTurno(), Turno.class));
-            gradoE.setNivel(grado.getNivel().getValor());
-            update(gradoE);
-        } else {
+        if(!existenciaGrado(gradoDtoE)){
+            Grado grado = findByGradoByNivel(gradoDtoE.getNivel(), gradoDtoE.getTurno().name());
+            grado.setProfesor(profesionalService.findById(profesionalDtoE.getCuil()));
+            repository.save(grado);
+
+
+        }
+        else {
             throw new EntityNotFoundException("El grado no existe en el sistema");
         }
 
+
     }
 
-    public void eliminarGrado(GradoDtoE grado) throws EntityNotFoundException {
-        if (existenciaGrado(grado)) {
-           Grado eliminar  = findByGradoByNivel((long)(grado.getNivel().getValor()), grado.getTurno().getNombre().name());
-            delete(eliminar.getId());
-
-        } else {
-            throw new EntityNotFoundException("El grado no se puede eliminar porque no existe");
+    public void eliminarGrado(@Valid GradoDtoE grado) throws EntityNotFoundException {
+        if(existenciaGrado(grado)){
+            delete(findByGradoByNivel(grado.getNivel(), grado.getTurno().name()).getId());
+        }
+        else {
+            throw new EntityNotFoundException("El grado no existe en el sistema");
         }
 
 
     }
 
     public List<GradoDtoS> todos() {
-        ModelMapper modelMapper = new ModelMapper();
         List<Grado> grados = findAll();
         return grados.stream().map(gestorConversionDto::converterGradoDtoS).toList();
     }
 
-    public List<GradoDtoS> buscarGradoPorNivel(Long nivel) throws EntityNotFoundException {
-        ModelMapper modelMapper = new ModelMapper();
+    public List<GradoDtoS> buscarGradoPorNivel(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO)
+                                              @Max(value = 6, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long nivel) throws EntityNotFoundException {
         List<Grado> grados = findGradoByNivel(nivel);
         return grados.stream().map(gestorConversionDto::converterGradoDtoS).toList();
 
     }
 
-    private boolean existenciaGrado(GradoDtoE grado) throws IllegalArgumentException {
-        //            throw new EntityExistsException("El grado existe en el sistema");
-        if (grado.getNivel() == null || grado.getTurno() == null) {
-            throw new IllegalArgumentException("Error algumentos vacios");
+   private boolean existenciaGrado(GradoDtoE gradoDtoE) {
+        if(existsGradoByNivel(gradoDtoE.getNivel())) {
+            if(findByGradoByNivel(gradoDtoE.getNivel(), gradoDtoE.getTurno().name()) != null) {
+                return true;
+
+            }
 
         }
-        return existsGradoByNivel((long) grado.getNivel().getValor())
-                && existsGradoByTurno_Nombre(grado.getTurno().getNombre().name());
-    }
+        return false;
+   }
+
 
 
 }

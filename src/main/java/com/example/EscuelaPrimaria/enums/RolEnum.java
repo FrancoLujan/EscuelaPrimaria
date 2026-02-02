@@ -10,7 +10,7 @@ Administrador: se encarga de el crud de las clase de seguridad, TODO LO REFERIDO
 
 roles de negocio
 
-Director: El director se encarga del crud de materias y de grados  ademas asi como la colacion de sexto grado. la colacion involucra
+Director: El director se encarga del crud de materias, turnos y de grados  ademas asi como la colacion de sexto grado. la colacion involucra
           que el director saca el promedio de toda la vida escolar de los alumnos(proceso automatico) y generando un diploma con dicho promedio
           el diploma tiene datos basicos del alumno(pdf) .
 

@@ -5,14 +5,14 @@ import lombok.Getter;
 @Getter
 
 public enum NivelEnum {
-    PRIMERO(1),
-    SEGUNDO(2),
-    TERCERO(3),
-    QUINTO(4),
-    SEXTO(5);
+    PRIMERO(1L),
+    SEGUNDO(2L),
+    TERCERO(3L),
+    QUINTO(4L),
+    SEXTO(5L);
 
-    private int valor;
-    NivelEnum(int i) {
+    private Long valor;
+    NivelEnum(Long i) {
         this.valor = i;
     }
 

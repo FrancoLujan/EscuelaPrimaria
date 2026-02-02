@@ -15,6 +15,6 @@ public class AlumnoDtoS {
     private String nombre;
     private String apellido;
     private int edad;
-    private String grado;
+    private Long grado;
 
 }

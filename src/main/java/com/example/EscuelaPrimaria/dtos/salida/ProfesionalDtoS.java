@@ -13,5 +13,5 @@ import org.springframework.stereotype.Component;
 public class ProfesionalDtoS {
     private String nombre;
     private String apellido;
-    private GradoDtoS grado;
+    private Long grado;
 }

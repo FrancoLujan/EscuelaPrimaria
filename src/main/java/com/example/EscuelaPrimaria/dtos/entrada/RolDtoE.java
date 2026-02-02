@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 // importante los constructores
+// no se esta usando
 public class RolDtoE {
     @Enumerated(EnumType.STRING)
     private RolEnum rol;

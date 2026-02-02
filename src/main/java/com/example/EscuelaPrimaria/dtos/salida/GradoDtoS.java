@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @Component
 public class GradoDtoS {
-    private  int nivel;
+    private Long nivel;
     private TurnoDtoS turno;
     private ProfesionalDtoS profesor;
     List<MateriaDtoS> materias;

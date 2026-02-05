@@ -16,4 +16,5 @@ public class ProfesionalDtoS {
     private String nombre;
     private String apellido;
     private Long grado;
+    private List<String> rol;
 }

@@ -17,7 +17,7 @@ public class Profesional {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "cuil")
     private Long cuil;
 
     @Column(name = "nombre")

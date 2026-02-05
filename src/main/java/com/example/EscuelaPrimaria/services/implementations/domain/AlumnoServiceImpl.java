@@ -81,19 +81,21 @@ public class AlumnoServiceImpl implements AlumnoService<Alumno, Long> {
         return  repository.findAlumnoByUsuario_Id(idUsuario);
     }
 
-    // AL CREAR VACIO, PUEDO CREARLO UNA VEZ CREADO Y EL USUARIO LUEGO SETEO
-    public void crearAlumnoVacio(Usuario usuario) throws EntityExistsException {
-        Alumno alumno = new Alumno();
-        alumno.setUsuario(usuario);
-        if(!existsAlumnoByCuil(alumno.getCuil())) {
+    // AL CREAR VACIO,  UNA VEZ CREADO Y EL USUARIO LUEGO SETEO
+    // Esto se hace para que le creacion de todos los usuarios sea por USUARIO
 
+    public void crearAlumnoVacio(Usuario usuario) throws EntityExistsException {
+
+        if(usuario.getAlumno() == null) {
+            Alumno alumno = new Alumno();
+            alumno.setUsuario(usuario);
             add(alumno);
         }else {
             throw new EntityExistsException("Alumno ya existe");
         }
     }
     // mediante el ID esta actualizacion debe realizarce de inmediato se crea el usuario...
-    public void actualizar(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idUsuario ,
+    public void actualizarUsuarioAlumno(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idUsuario ,
                            @Valid AlumnoDtoE alumno) throws EntityNotFoundException {
 
             Alumno alumnoE = findAlumnoByUsuario_Id(idUsuario);
@@ -102,6 +104,7 @@ public class AlumnoServiceImpl implements AlumnoService<Alumno, Long> {
             alumnoE.setApellido(alumno.getApellido());
             alumnoE.setFechaNacimiento(alumno.getFechaNacimiento());
 
+
             update(alumnoE);
 
 
@@ -109,7 +112,7 @@ public class AlumnoServiceImpl implements AlumnoService<Alumno, Long> {
 
 
 // ESTE ACTULIZAR TENES QUE MODIFICAR ESTE ES EL NORMAL
-    public void actualizarExistente(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long cuil ,
+    public void actualizarDatos(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long cuil ,
                            @Valid AlumnoDtoE alumno) throws EntityNotFoundException {
 
         if (existsAlumnoByCuil(cuil)) {

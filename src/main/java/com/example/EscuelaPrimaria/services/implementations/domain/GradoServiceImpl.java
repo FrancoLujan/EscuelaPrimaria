@@ -109,12 +109,14 @@ public class GradoServiceImpl implements GradoService<Grado, Long> {
 
     // se hace de manera inmediata para asignar profe
     public void actualizarGrado(@Valid GradoDtoE gradoDtoE,
-                               @Valid ProfesionalDtoE profesionalDtoE) throws EntityNotFoundException {
+                               Long cuil) throws EntityNotFoundException {
 
-        if(!existenciaGrado(gradoDtoE)){
+        if(existenciaGrado(gradoDtoE)){
             Grado grado = findByGradoByNivel(gradoDtoE.getNivel(), gradoDtoE.getTurno().name());
-            grado.setProfesor(profesionalService.findById(profesionalDtoE.getCuil()));
-            repository.save(grado);
+            Profesional profesional =  profesionalService.findProfesionalByCuil(cuil).getFirst();
+            profesional.setGrado(grado);
+            grado.setProfesor(profesional);
+            update(grado);
 
 
         }

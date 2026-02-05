@@ -1,6 +1,7 @@
 package com.example.EscuelaPrimaria.services.implementations.domain;
 
 import com.example.EscuelaPrimaria.dtos.salida.TurnoDtoS;
+import com.example.EscuelaPrimaria.entities.domain.Grado;
 import com.example.EscuelaPrimaria.entities.domain.Turno;
 import com.example.EscuelaPrimaria.enums.TurnoEnum;
 import com.example.EscuelaPrimaria.errors.MensajeErrorValidaciones;

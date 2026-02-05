@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface MateriaRepository extends JpaRepository<Materia, Long> {
     Materia findMateriaByNombre(String nombre);
     boolean findMateriaByNombreEqualsIgnoreCase(String nombre);
+    List<Materia> findMateriaByGrado_Id(Long id);
+    List<Materia> findMateriaByGrado_Nivel(Long nivel);
 }

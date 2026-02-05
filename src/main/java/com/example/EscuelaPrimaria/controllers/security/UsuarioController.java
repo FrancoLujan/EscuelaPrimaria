@@ -16,7 +16,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/Usuario")
 @AllArgsConstructor
-@PreAuthorize("hasRole('ADMINISTRADOR')")
+//@PreAuthorize("hasRole('ADMINISTRADOR')")
+
+/*
+    Importante pasos de creacion correcta
+    1. crear usuario
+    2. asignar rol (esto creara un Alumno o Un profesional  )
+    3. actualizar datos, del correspondiente rol es decir si es un profesionar uso los edpoint de profesionar para actualizar
+    y confirmar una creacion correcta del usuario y el rol
+    4. FIN. Seguido los 3 pasos tendras un profesional o un alumno perfectamente creado
+ */
 public class UsuarioController {
     private final UsuarioServiceImpl usuarioService;
 

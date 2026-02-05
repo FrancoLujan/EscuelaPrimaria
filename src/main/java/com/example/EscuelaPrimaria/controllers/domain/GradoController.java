@@ -26,9 +26,9 @@ public class GradoController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Grado creado");
     }
 
-    @PatchMapping("/actualizar")
-    public ResponseEntity<String> actualizar(@RequestBody GradoDtoE gradoActualizar, @RequestBody ProfesionalDtoE profesionalDtoE) {
-        gradoService.actualizarGrado(gradoActualizar, profesionalDtoE);
+    @PatchMapping("/actualizar/{cuilProfe}")
+    public ResponseEntity<String> actualizar(@RequestBody GradoDtoE gradoActualizar, @PathVariable Long cuilProfe) {
+        gradoService.actualizarGrado(gradoActualizar, cuilProfe);
         return ResponseEntity.status(HttpStatus.OK).body("Grado actualizado");
     }
 

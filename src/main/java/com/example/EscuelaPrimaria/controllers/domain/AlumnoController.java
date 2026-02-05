@@ -18,7 +18,7 @@ import java.util.List;
 // POSIBLE REPLANTEO
 // porque la logica no permite que se crear alumno de manera independiente si no de manera conjunta con usuario
 // por logica entonces al eliminar el usuario se elimina el alumno entonces pensar si dejas el endpoint
-@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ALUMNO')")
+//@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ALUMNO')")
 public class AlumnoController {
     private final AlumnoServiceImpl alumnoService;
 
@@ -29,30 +29,30 @@ public class AlumnoController {
 //
 //    }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
 
-    @PatchMapping("/actualizar/{idUsuario}")
-    public ResponseEntity<AlumnoDtoS> actualizarNuevo(@RequestBody AlumnoDtoE alumno, @PathVariable Long idUsuario) {
-        alumnoService.actualizar(idUsuario, alumno);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(alumnoService.buscarAlumnoPorCuil(alumno.getCuil()));
-
-    }
-    @PreAuthorize("hasAuthority('UPDATE')")
-    @PatchMapping("/actualizar/{cuil}")
-    public ResponseEntity<AlumnoDtoS> actualizarExistente(@RequestBody AlumnoDtoE alumno, @PathVariable Long cuil) {
-        alumnoService.actualizarExistente(cuil, alumno);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(alumnoService.buscarAlumnoPorCuil(cuil));
+    @PatchMapping("/actualizar/usuario/{idUsuario}")
+    public ResponseEntity<String> actualizarUsuarioAlumno(@RequestBody AlumnoDtoE alumno, @PathVariable Long idUsuario) {
+        alumnoService.actualizarUsuarioAlumno(idUsuario, alumno);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Actualizado Correctamente");
 
     }
+    //@PreAuthorize("hasAuthority('UPDATE')")
+    @PatchMapping("/actualizar/datos/{cuil}")
+    public ResponseEntity<String> actualizarDatos(@RequestBody AlumnoDtoE alumno, @PathVariable Long cuil) {
+        alumnoService.actualizarDatos(cuil, alumno);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Actualizado correctamente");
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    }
+
+   // @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/eliminar/{cuil}")
     public ResponseEntity<String> eliminar(@PathVariable Long cuil) {
         alumnoService.eliminar(cuil);
         return ResponseEntity.status(HttpStatus.OK).body("Alumno eliminado correctamente");
     }
 
-    @PreAuthorize("hasAuthority('READ')")
+    //@PreAuthorize("hasAuthority('READ')")
     @GetMapping("/todos")
     public ResponseEntity<List<AlumnoDtoS>> todos(){
         List<AlumnoDtoS> alumnos = alumnoService.todos();

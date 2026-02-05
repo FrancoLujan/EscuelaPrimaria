@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/Turno")
 @AllArgsConstructor
-@PreAuthorize("hasAuthority('ADMINISTRADOR')")
+//@PreAuthorize("hasAuthority('ADMINISTRADOR')")
 public class TurnoController {
     final private TurnoServiceImpl turnoService;
 
@@ -37,13 +37,13 @@ public class TurnoController {
         return ResponseEntity.status(HttpStatus.OK).body("El Turno eliminado correctamente");
     }
 
-    @PreAuthorize("hasAnyRole(permitAll())")
+    //@PreAuthorize("hasAnyRole(permitAll())")
     @GetMapping("/todos")
     public ResponseEntity<List<TurnoDtoS>> todos() {
         List<TurnoDtoS> turnos = turnoService.todos();
         return ResponseEntity.status(HttpStatus.OK).body(turnos);
     }
-    @PreAuthorize("hasAnyRole(permitAll())")
+   // @PreAuthorize("hasAnyRole(permitAll())")
     @GetMapping("/buscar/{nombre}")
     public ResponseEntity<TurnoDtoS> buscar(@PathVariable String nombre) {
 

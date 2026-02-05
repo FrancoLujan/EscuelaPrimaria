@@ -5,10 +5,12 @@ import com.example.EscuelaPrimaria.dtos.entrada.UsuarioDtoSeteo;
 import com.example.EscuelaPrimaria.dtos.salida.UsuarioDtoS;
 import com.example.EscuelaPrimaria.entities.security.Rol;
 import com.example.EscuelaPrimaria.entities.security.Usuario;
+import com.example.EscuelaPrimaria.enums.RolEnum;
 import com.example.EscuelaPrimaria.errors.MensajeErrorValidaciones;
 import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.repositories.security.UsuarioRepository;
 import com.example.EscuelaPrimaria.services.implementations.domain.AlumnoServiceImpl;
+import com.example.EscuelaPrimaria.services.implementations.domain.ProfesionalServiceImpl;
 import com.example.EscuelaPrimaria.services.interfaces.security.UsuarioService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +42,7 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
     private final RolServiceImpl rolService;
     private final GestorConversionDto conversion;
     private final AlumnoServiceImpl alumnoService;
+    private final ProfesionalServiceImpl profesionalService;
     //private final ProfesionalServiceImpl profesionalService;
 
     @Override
@@ -136,7 +140,7 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
     // Se repite en todas las actualizaciones
     public void actualizarMail(@NotNull @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long id,
                                @Email(message = MensajeErrorValidaciones.MENSAJE_EMAIL) String mail)
-            throws EntityNotFoundException, ConstraintViolationException {
+            throws EntityNotFoundException {
 
         Usuario usuario = findById(id);
         usuario.setMail(mail);
@@ -192,9 +196,13 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
 
     // cuidado Esto tendria QUE ESTAR EN el servicio de roles (por como estan las relaciones de las tablas...)
     public void asociarRol(@Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idUsuario,
-                           @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idRol) throws EntityNotFoundException, ConstraintViolationException {
+                           @Min(value = 1, message = MensajeErrorValidaciones.MENSAJE_NUMERO) Long idRol) throws EntityNotFoundException, ConstraintViolationException
+    , EntityExistsException {
         Usuario usuario = findById(idUsuario);
         Rol rol = rolService.findById(idRol);
+        if (usuario.getRoles().contains(rol)) {
+            throw new EntityExistsException("Existe el rol para dicho usuario");
+        }
         usuario.getRoles().add(rol);
         rol.getUsuarios().add(usuario);
         rolService.update(rol);
@@ -208,9 +216,11 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
     private void asociarEntidad(Long id) {
         Usuario usuario = findById(id);
         usuario.getRoles().forEach(rol -> {
-            if (rol.getNombre().equalsIgnoreCase("ALUMNO")) {
+            if (rol.getNombre().equalsIgnoreCase(RolEnum.ALUMNO.toString())) {
                 alumnoService.crearAlumnoVacio(usuario); // CREAR UN ALUMNO VACIO pero con usuario
-            } // luego agregar el de profesional....
+            } else if(Arrays.stream(RolEnum.values()).anyMatch(e -> e.name().equalsIgnoreCase(rol.getNombre()))) {
+                profesionalService.crearProfesionalVacio(usuario);
+            }
         });
 
     }
@@ -245,6 +255,9 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
                 listAuthority
         );
     }
+
+
+
 
 
 }

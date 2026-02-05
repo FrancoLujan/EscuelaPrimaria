@@ -15,6 +15,7 @@ import java.util.List;
 public class ProfesionalDtoS {
     private String nombre;
     private String apellido;
+    private Long cuil;
     private Long grado;
     private List<String> rol;
 }

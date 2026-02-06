@@ -39,5 +39,11 @@ public class ProfesionalController {
     public ResponseEntity<List<ProfesionalDtoS>> buscar(@PathVariable Long cuil) {
         return ResponseEntity.ok(profesionalService.buscarPorCuil(cuil));
     }
+
+    @GetMapping("buscar/profesional/{rol}")
+    public ResponseEntity<List<ProfesionalDtoS>> profesionalPorRol(@PathVariable String rol) {
+        return  ResponseEntity.ok(profesionalService.buscarProfesionalPorROl(rol));
+
+    }
 }
 

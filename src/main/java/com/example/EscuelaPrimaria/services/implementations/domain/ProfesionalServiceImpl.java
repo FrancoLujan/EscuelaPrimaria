@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -126,7 +127,7 @@ public class ProfesionalServiceImpl implements ProfesionalService<Profesional, L
 
     }
 
-    public List<ProfesionalDtoS> todos()  {
+    public List<ProfesionalDtoS> todos() {
         return findAll().stream()
                 .map(dto::converterProfesionalDtoS)
                 .toList();
@@ -146,8 +147,26 @@ public class ProfesionalServiceImpl implements ProfesionalService<Profesional, L
     private boolean existeProfesionalUnico(Long cuil) {
         int cantidadProfesionales = findProfesionalByCuil(cuil).size();
         return cantidadProfesionales != 0;
+
     }
 
     // CREAR METODOS PARA MOSTRAR PORFESIONALES POR TIPO DE ROL
+
+    public List<ProfesionalDtoS> buscarProfesionalPorROl(@NotBlank(message = MensajeErrorValidaciones.MENSAJE_NOMBRE) String rol) throws EntityNotFoundException {
+        if (!findAll().isEmpty()) {
+            List<Profesional> profesionales = findAll().stream().filter(prof -> {
+
+                        if (prof.getUsuario().getRoles().stream().anyMatch(r -> r.getNombre().equals(rol))) return true;
+                        return false;
+
+
+                    })
+                    .toList();
+            return profesionales.stream().map(dto::converterProfesionalDtoS).toList();
+        } else {
+            throw new EntityNotFoundException("el profesional no existe");
+        }
+
+    }
 
 }

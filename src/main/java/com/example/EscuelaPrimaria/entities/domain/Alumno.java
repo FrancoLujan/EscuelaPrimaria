@@ -31,6 +31,10 @@ public class  Alumno {
     @Column(name = "fechaDeNacimiento")
     private LocalDate fechaNacimiento;
 
+    // definira si el alumno pasa o no de grado, EN TRUE SI PASA Y POR DEFECTO....
+    @JoinColumn(name = "estadoAcademico")
+    private Boolean estadoAcademico;
+
     @ManyToOne
     @JoinColumn(name = "id_grado")
     @JsonBackReference

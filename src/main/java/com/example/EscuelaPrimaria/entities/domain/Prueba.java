@@ -1,5 +1,6 @@
 package com.example.EscuelaPrimaria.entities.domain;
 
+import com.example.EscuelaPrimaria.entities.security.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,7 +41,8 @@ public class Prueba {
     private List<Alumno> alumnos;
 
 
-
+    @ManyToMany(mappedBy = "pruebas")
+    private List<Materia> materias;
 
 
 

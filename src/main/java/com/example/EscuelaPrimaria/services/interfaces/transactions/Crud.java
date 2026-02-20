@@ -1,4 +1,4 @@
-package com.example.EscuelaPrimaria.services.interfaces;
+package com.example.EscuelaPrimaria.services.interfaces.transactions;
 
 
 import java.util.List;

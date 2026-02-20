@@ -1,7 +1,6 @@
 package com.example.EscuelaPrimaria.services.interfaces.domain;
 
-import com.example.EscuelaPrimaria.entities.domain.Profesional;
-import com.example.EscuelaPrimaria.services.interfaces.Crud;
+import com.example.EscuelaPrimaria.services.interfaces.transactions.Crud;
 
 import java.util.List;
 

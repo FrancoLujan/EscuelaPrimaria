@@ -1,7 +1,6 @@
 package com.example.EscuelaPrimaria.services.interfaces.domain;
 
-import com.example.EscuelaPrimaria.entities.domain.Alumno;
-import com.example.EscuelaPrimaria.services.interfaces.Crud;
+import com.example.EscuelaPrimaria.services.interfaces.transactions.Crud;
 
 public interface AlumnoService<T,K> extends Crud<T,K> {
     T findAlumnoByCuil(K cuil);

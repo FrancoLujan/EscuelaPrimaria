@@ -1,7 +1,9 @@
 package com.example.EscuelaPrimaria.services.implementations.security;
 
+import com.example.EscuelaPrimaria.dtos.entrada.LoginDtoE;
 import com.example.EscuelaPrimaria.dtos.entrada.UsuarioDtoE;
 import com.example.EscuelaPrimaria.dtos.entrada.UsuarioDtoSeteo;
+import com.example.EscuelaPrimaria.dtos.salida.LoginDtoS;
 import com.example.EscuelaPrimaria.dtos.salida.UsuarioDtoS;
 import com.example.EscuelaPrimaria.entities.security.Rol;
 import com.example.EscuelaPrimaria.entities.security.Usuario;
@@ -9,21 +11,28 @@ import com.example.EscuelaPrimaria.enums.RolEnum;
 import com.example.EscuelaPrimaria.errors.MensajeErrorValidaciones;
 import com.example.EscuelaPrimaria.gestores.GestorConversionDto;
 import com.example.EscuelaPrimaria.repositories.security.UsuarioRepository;
+import com.example.EscuelaPrimaria.securityConfig.PasswordEncoderConfig;
 import com.example.EscuelaPrimaria.services.implementations.domain.AlumnoServiceImpl;
 import com.example.EscuelaPrimaria.services.implementations.domain.ProfesionalServiceImpl;
 import com.example.EscuelaPrimaria.services.interfaces.security.UsuarioService;
+import com.example.EscuelaPrimaria.utils.JwtUtils;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -43,6 +52,8 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
     private final GestorConversionDto conversion;
     private final AlumnoServiceImpl alumnoService;
     private final ProfesionalServiceImpl profesionalService;
+    private final JwtUtils jwtUtils;
+    private final PasswordEncoderConfig passwordEncoder;
     //private final ProfesionalServiceImpl profesionalService;
 
     @Override
@@ -255,6 +266,29 @@ public class UsuarioServiceImpl implements UsuarioService<Usuario, Long>, UserDe
                 listAuthority
         );
     }
+
+    public LoginDtoS loginUser(@Valid LoginDtoE loginDtoE) {
+        String username = loginDtoE.getUsuario();
+        String password = loginDtoE.getPassword();
+
+        Authentication authentication = authentication(username, password);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtUtils.createToken(authentication);
+
+        return new LoginDtoS(username,"login ok",token);
+
+    }
+
+    public Authentication authentication(String username, String password) {
+        UserDetails userDetails = loadUserByUsername(username);
+
+        if(userDetails == null) throw new BadCredentialsException("El usuario o contraseña incorrecta");
+        if(!passwordEncoder.passwordEncoder().matches(password, userDetails.getPassword())) throw new BadCredentialsException("El usuario o contraseña incorrecta");
+
+        return new UsernamePasswordAuthenticationToken(username, userDetails.getPassword(), userDetails.getAuthorities());
+    }
+
 
 
 

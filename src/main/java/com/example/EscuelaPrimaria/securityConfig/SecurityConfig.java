@@ -1,6 +1,9 @@
 package com.example.EscuelaPrimaria.securityConfig;
 
+import com.example.EscuelaPrimaria.securityConfig.filter.JwtTokenValidator;
 import com.example.EscuelaPrimaria.services.implementations.security.UsuarioServiceImpl;
+import com.example.EscuelaPrimaria.utils.JwtUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,13 +20,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@AllArgsConstructor
 public class SecurityConfig {
-    @Autowired
+
     private UsuarioServiceImpl usuarioServiceImpl;
+
+    private JwtUtils jwtUtils;
+
+    private PasswordEncoderConfig passwordEncoderConfig;
 
     @Bean
     //cadena de filtros
@@ -32,6 +41,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(s-> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
                 .build();
     }
     @Bean
@@ -44,14 +54,14 @@ public class SecurityConfig {
     //Auntentica segun del proveedor
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setPasswordEncoder(passwordEncoderConfig.passwordEncoder());
         provider.setUserDetailsService(usuarioServiceImpl);
         return provider;
     }
 
-    @Bean
-    //ENCRIPTADO
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    //ENCRIPTADO
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 }
